@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동그라미 숫자 빈도 분석기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #EFF6FF 0%, #E0E7FF 100%);
+            min-height: 100vh;
+            padding: 0.5rem;
+        }
+
+        @media (min-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.75rem;
+            color: #3730A3;
+        }
+
+        @media (min-width: 640px) {
+            h1 {
+                font-size: 1.875rem;
+            }
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: #4B5563;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        textarea {
+            width: 100%;
+            height: 10rem;
+            padding: 0.75rem;
+            border: 2px solid #D1D5DB;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #6366F1;
+        }
+
+        button {
+            margin-top: 0.75rem;
+            width: 100%;
+            background: #6366F1;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #4F46E5;
+        }
+
+        button:active {
+            background: #4338CA;
+        }
+
+        .analysis-box {
+            background: linear-gradient(135deg, #F5F3FF 0%, #EFF6FF 100%);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid #E5E7EB;
+        }
+
+        .analysis-title {
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            color: #1F2937;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .card-label {
+            font-size: 0.75rem;
+            color: #4B5563;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .number-display {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .number-display span {
+            font-size: 1.875rem;
+        }
+
+        .dividend-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1F2937;
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+        }
+
+        .proportion-value {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #059669;
+            margin-top: 0.25rem;
+        }
+
+        .ratio-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .ratio-box {
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #D1D5DB;
+        }
+
+        .ratio-box.yellow {
+            background: #FEF3C7;
+            border-color: #FDE68A;
+        }
+
+        .ratio-label {
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .ratio-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .ratio-formula {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .total-ratio-box {
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid #E5E7EB;
+        }
+
+        .total-ratio-title {
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: black;
+        }
+
+        .total-ratio-value {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: black;
+        }
+
+        .total-ratio-formula {
+            font-size: 0.875rem;
+            color: black;
+            margin-top: 0.25rem;
+        }
+
+        .info-box {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-title {
+            font-size: 0.875rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .gradient-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .gradient-box {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .color-sample {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 0.25rem;
+        }
+
+        .gradient-fill {
+            flex: 1;
+            height: 1.25rem;
+            border-radius: 0.25rem;
+            background: linear-gradient(to right, rgb(96, 165, 250), rgb(255, 255, 255), rgb(239, 68, 68));
+        }
+
+        .info-text {
+            font-size: 0.75rem;
+            color: #4B5563;
+            margin-top: 0.5rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .table-title {
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 0.75rem;
+            background: #F9FAFB;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #D1D5DB;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        th {
+            background: #F3F4F6;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+
+        th.orange-bg {
+            background: #FED7AA;
+        }
+
+        td.yellow-bg {
+            background: #FDE047;
+            font-size: 1.5rem;
+        }
+
+        td.orange-bg {
+            background: #FEF3C7;
+        }
+
+        td.value-cell {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+    
+
+        /* ========== index2222 스타일 ========== */
+
+        /* 테이블 헤더 색상 명시적 적용 */
+        #results2 .data-table thead {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%) !important;
+            color: white !important;
+        }
+
+        #results2 .data-table thead.red {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+            color: white !important;
+        }
+
+        #results2 .data-table thead.blue {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+            color: white !important;
+        }
+
+        #results2 .data-table thead th {
+            color: white !important;
+            font-weight: 600 !important;
+            background: transparent !important;
+        }
+        
+        /* 테이블 일반 셀 */
+        #results2 .data-table td {
+            color: #555 !important;
+            background: white !important;
+        }
+
+        /* 모바일 반응형 조정 */
+        @media (max-width: 768px) {
+            .idx2-container {
+                padding: 0.5rem !important;
+                border-radius: 10px !important;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e88e5 0%, #00acc1 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+            position: relative;
+        }
+
+        .idx2-container {
+            padding: 1rem !important;
+            margin: 0 !important;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-section label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .clear-btn {
+            background: #e0e0e0;
+            color: #555;
+        }
+
+        .clear-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .save-status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            border-left: 5px solid #2196f3;
+        }
+
+        .save-status-text {
+            font-size: 16px;
+            color: #1565c0;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .save-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .excel-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .excel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .delete-all-btn {
+            flex: 1;
+            background: #f44336;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .delete-all-btn:hover {
+            background: #d32f2f;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .number-section {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .number-section.summary {
+            border-left-color: #e74c3c;
+        }
+
+        .number-section.crosspoint {
+            border-left-color: #3498db;
+            background: #ebf5fb;
+        }
+
+        .number-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .number-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .number-badge.red {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .number-badge.blue {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            table-layout: fixed;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+        }
+
+        .data-table thead.red {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .data-table thead.blue {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .data-table td {
+            color: #555;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f0f0f0;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pair-cell {
+            font-weight: 600;
+            color: #ff6b35;
+            font-size: 14px;
+        }
+
+        .odds-cell {
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 14px;
+        }
+
+        .ratio-cell {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .formula-cell {
+            color: #e67e22;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .result-cell {
+            color: #2980b9;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            border-left: 5px solid #ffc107;
+        }
+
+        .summary-text {
+            font-size: 14px;
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .chart-label {
+            width: 40px;
+            font-weight: 600;
+            color: #ff6b35;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .chart-bar-container {
+            flex: 1;
+            height: 24px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+        }
+
+        .chart-value {
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .crosspoint-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2980b9;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .idx2-container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+        }
+    
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 동그라미 숫자 빈도 분석기</h1>
+
+        <div class="input-section">
+            <label>데이터 입력 (자유 형식)</label>
+            <p class="hint">
+                동그라미 숫자 6개가 1줄입니다. 숫자나 공백은 무시되며 동그라미 숫자만 추출됩니다.<br/>
+                예: ⑥⑪ 4.6 ⑥④ 6.8 ⑥③ 7.3 (이렇게 입력해도 자동으로 ⑥⑪⑥④⑥③로 인식)
+            </p>
+            <textarea id="inputData" placeholder="예시:
+⑥⑪ 4.6 ⑥④ 6.8 ⑥③ 7.3
+⑥⑤ 8.5 ⑪⑥ 11.6 ⑥② 13.5"></textarea>
+            <button onclick="analyzeData()">분석하기</button>
+        </div>
+
+        <div id="results"></div>
+
+        <!-- ========== index2222 영역 ========== -->
+        <div style="
+            background: linear-gradient(135deg, #1e88e5 0%, #00acc1 100%);
+            margin: 2rem 0 1.5rem 0;
+            padding: 1rem;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        ">
+            📊 배당율 상세 분석
+        </div>
+
+        <div class="idx2-container">
+            <div id="results2" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        let results = null;
+        let analysis1 = null;
+        let analysis2 = null;
+        let analysis3 = null;
+
+        function extractNumbers(pair) {
+            return pair.split('');
+        }
+
+        function analyzeData() {
+            const inputData = document.getElementById('inputData').value;
+            
+            if (!inputData.trim()) {
+                alert('데이터를 입력해주세요!');
+                return;
+            }
+
+            const circledNumbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬', '⑭', '⑮', '⑯'];
+            
+            const pairs = [];
+            const dividends = [];
+            
+            const tokens = inputData.match(/[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯]|[\d.]+/g) || [];
+            
+            for (let i = 0; i < tokens.length - 2; i++) {
+                if (circledNumbers.includes(tokens[i]) && 
+                    circledNumbers.includes(tokens[i + 1]) &&
+                    !isNaN(parseFloat(tokens[i + 2]))) {
+                    pairs.push(tokens[i] + tokens[i + 1]);
+                    dividends.push(parseFloat(tokens[i + 2]));
+                }
+            }
+            
+            const sortedData = pairs.map((pair, idx) => ({
+                pair: pair,
+                dividend: dividends[idx]
+            })).sort((a, b) => a.dividend - b.dividend);
+            
+            // 교차점분석1
+            let lowest1 = null;
+            let lowest2 = null;
+            let crossPoint1 = null;
+            
+            if (sortedData.length >= 2) {
+                // 공통 숫자가 있는 최저 2개 짝 찾기
+                for (let i = 0; i < sortedData.length; i++) {
+                    for (let j = i + 1; j < sortedData.length; j++) {
+                        const p1 = sortedData[i];
+                        const p2 = sortedData[j];
+                        
+                        const num1_1 = p1.pair[0];
+                        const num1_2 = p1.pair[1];
+                        const num2_1 = p2.pair[0];
+                        const num2_2 = p2.pair[1];
+                        
+                        let crossNum1, crossNum2;
+                        let hasCommon = false;
+                        
+                        if (num1_1 === num2_1) {
+                            crossNum1 = num1_2;
+                            crossNum2 = num2_2;
+                            hasCommon = true;
+                        } else if (num1_1 === num2_2) {
+                            crossNum1 = num1_2;
+                            crossNum2 = num2_1;
+                            hasCommon = true;
+                        } else if (num1_2 === num2_1) {
+                            crossNum1 = num1_1;
+                            crossNum2 = num2_2;
+                            hasCommon = true;
+                        } else if (num1_2 === num2_2) {
+                            crossNum1 = num1_1;
+                            crossNum2 = num2_1;
+                            hasCommon = true;
+                        }
+                        
+                        if (hasCommon) {
+                            const crossPair1_1 = crossNum1 + crossNum2;
+                            const crossPair1_2 = crossNum2 + crossNum1;
+                            
+                            const crossIdx1 = pairs.indexOf(crossPair1_1);
+                            const crossIdx2 = pairs.indexOf(crossPair1_2);
+                            
+                            if (crossIdx1 !== -1) {
+                                lowest1 = p1;
+                                lowest2 = p2;
+                                crossPoint1 = {
+                                    pair: crossPair1_1,
+                                    dividend: dividends[crossIdx1]
+                                };
+                                break;
+                            } else if (crossIdx2 !== -1) {
+                                lowest1 = p1;
+                                lowest2 = p2;
+                                crossPoint1 = {
+                                    pair: crossPair1_2,
+                                    dividend: dividends[crossIdx2]
+                                };
+                                break;
+                            }
+                        }
+                    }
+                    if (lowest1 && lowest2 && crossPoint1) break;
+                }
+                
+                if (crossPoint1) {
+                    const sum1 = lowest1.dividend + lowest2.dividend + crossPoint1.dividend;
+                    const ratio1 = ((lowest1.dividend * lowest2.dividend) / crossPoint1.dividend).toFixed(6);
+                    const addRatio1 = ((lowest1.dividend + lowest2.dividend) / crossPoint1.dividend).toFixed(6);
+                    
+                    analysis1 = {
+                        ratio: ratio1,
+                        addRatio: addRatio1,
+                        items: [
+                            {
+                                label: '최저배당1',
+                                pair: lowest1.pair,
+                                dividend: lowest1.dividend,
+                                proportion: (lowest1.dividend / sum1) * 100
+                            },
+                            {
+                                label: '최저배당2',
+                                pair: lowest2.pair,
+                                dividend: lowest2.dividend,
+                                proportion: (lowest2.dividend / sum1) * 100
+                            },
+                            {
+                                label: '교차점',
+                                pair: crossPoint1.pair,
+                                dividend: crossPoint1.dividend,
+                                proportion: (crossPoint1.dividend / sum1) * 100
+                            }
+                        ]
+                    };
+                }
+            }
+            
+            // 교차점분석2
+            if (analysis1 && sortedData.length >= 3) {
+                const usedNumbers1 = new Set([
+                    ...extractNumbers(analysis1.items[0].pair),
+                    ...extractNumbers(analysis1.items[1].pair),
+                    ...extractNumbers(analysis1.items[2].pair)
+                ]);
+                
+                const availablePairs = sortedData.filter(item => {
+                    const nums = extractNumbers(item.pair);
+                    return !nums.some(n => usedNumbers1.has(n));
+                });
+                
+                // 공통 숫자가 있는 최저 2개 짝 찾기
+                let pair2_1 = null;
+                let pair2_2 = null;
+                let crossPoint2 = null;
+                
+                for (let i = 0; i < availablePairs.length; i++) {
+                    for (let j = i + 1; j < availablePairs.length; j++) {
+                        const p1 = availablePairs[i];
+                        const p2 = availablePairs[j];
+                        
+                        const num1_1 = p1.pair[0];
+                        const num1_2 = p1.pair[1];
+                        const num2_1 = p2.pair[0];
+                        const num2_2 = p2.pair[1];
+                        
+                        let crossNum1, crossNum2;
+                        let hasCommon = false;
+                        
+                        if (num1_1 === num2_1) {
+                            crossNum1 = num1_2;
+                            crossNum2 = num2_2;
+                            hasCommon = true;
+                        } else if (num1_1 === num2_2) {
+                            crossNum1 = num1_2;
+                            crossNum2 = num2_1;
+                            hasCommon = true;
+                        } else if (num1_2 === num2_1) {
+                            crossNum1 = num1_1;
+                            crossNum2 = num2_2;
+                            hasCommon = true;
+                        } else if (num1_2 === num2_2) {
+                            crossNum1 = num1_1;
+                            crossNum2 = num2_1;
+                            hasCommon = true;
+                        }
+                        
+                        if (hasCommon) {
+                            const crossPair_1 = crossNum1 + crossNum2;
+                            const crossPair_2 = crossNum2 + crossNum1;
+                            
+                            const crossIdx1 = pairs.indexOf(crossPair_1);
+                            const crossIdx2 = pairs.indexOf(crossPair_2);
+                            
+                            if (crossIdx1 !== -1 || crossIdx2 !== -1) {
+                                pair2_1 = p1;
+                                pair2_2 = p2;
+                                
+                                if (crossIdx1 !== -1) {
+                                    crossPoint2 = {
+                                        pair: crossPair_1,
+                                        dividend: dividends[crossIdx1]
+                                    };
+                                } else {
+                                    crossPoint2 = {
+                                        pair: crossPair_2,
+                                        dividend: dividends[crossIdx2]
+                                    };
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (pair2_1 && pair2_2 && crossPoint2) break;
+                }
+                
+                if (pair2_1 && pair2_2 && crossPoint2) {
+                    const sum2 = pair2_1.dividend + pair2_2.dividend + crossPoint2.dividend;
+                    const ratio2 = ((pair2_1.dividend * pair2_2.dividend) / crossPoint2.dividend).toFixed(6);
+                    const addRatio2 = ((pair2_1.dividend + pair2_2.dividend) / crossPoint2.dividend).toFixed(6);
+                    
+                    analysis2 = {
+                        ratio: ratio2,
+                        addRatio: addRatio2,
+                        items: [
+                            {
+                                label: '1번짝',
+                                pair: pair2_1.pair,
+                                dividend: pair2_1.dividend,
+                                proportion: (pair2_1.dividend / sum2) * 100
+                            },
+                            {
+                                label: '2번짝',
+                                pair: pair2_2.pair,
+                                dividend: pair2_2.dividend,
+                                proportion: (pair2_2.dividend / sum2) * 100
+                            },
+                            {
+                                label: '교차점',
+                                pair: crossPoint2.pair,
+                                dividend: crossPoint2.dividend,
+                                proportion: (crossPoint2.dividend / sum2) * 100
+                            }
+                        ]
+                    };
+                }
+            }
+            
+            // 교차점분석3
+            if (analysis1 && analysis2 && sortedData.length >= 3) {
+                const usedNumbers2 = new Set([
+                    ...extractNumbers(analysis1.items[0].pair),
+                    ...extractNumbers(analysis1.items[1].pair),
+                    ...extractNumbers(analysis1.items[2].pair),
+                    ...extractNumbers(analysis2.items[0].pair),
+                    ...extractNumbers(analysis2.items[1].pair),
+                    ...extractNumbers(analysis2.items[2].pair)
+                ]);
+                
+                const availablePairs = sortedData.filter(item => {
+                    const nums = extractNumbers(item.pair);
+                    return !nums.some(n => usedNumbers2.has(n));
+                });
+                
+                // 공통 숫자가 있는 최저 2개 짝 찾기
+                let pair3_1 = null;
+                let pair3_2 = null;
+                let crossPoint3 = null;
+                
+                for (let i = 0; i < availablePairs.length; i++) {
+                    for (let j = i + 1; j < availablePairs.length; j++) {
+                        const p1 = availablePairs[i];
+                        const p2 = availablePairs[j];
+                        
+                        const num1_1 = p1.pair[0];
+                        const num1_2 = p1.pair[1];
+                        const num2_1 = p2.pair[0];
+                        const num2_2 = p2.pair[1];
+                        
+                        let crossNum1, crossNum2;
+                        let hasCommon = false;
+                        
+                        if (num1_1 === num2_1) {
+                            crossNum1 = num1_2;
+                            crossNum2 = num2_2;
+                            hasCommon = true;
+                        } else if (num1_1 === num2_2) {
+                            crossNum1 = num1_2;
+                            crossNum2 = num2_1;
+                            hasCommon = true;
+                        } else if (num1_2 === num2_1) {
+                            crossNum1 = num1_1;
+                            crossNum2 = num2_2;
+                            hasCommon = true;
+                        } else if (num1_2 === num2_2) {
+                            crossNum1 = num1_1;
+                            crossNum2 = num2_1;
+                            hasCommon = true;
+                        }
+                        
+                        if (hasCommon) {
+                            const crossPair_1 = crossNum1 + crossNum2;
+                            const crossPair_2 = crossNum2 + crossNum1;
+                            
+                            const crossIdx1 = pairs.indexOf(crossPair_1);
+                            const crossIdx2 = pairs.indexOf(crossPair_2);
+                            
+                            if (crossIdx1 !== -1 || crossIdx2 !== -1) {
+                                pair3_1 = p1;
+                                pair3_2 = p2;
+                                
+                                if (crossIdx1 !== -1) {
+                                    crossPoint3 = {
+                                        pair: crossPair_1,
+                                        dividend: dividends[crossIdx1]
+                                    };
+                                } else {
+                                    crossPoint3 = {
+                                        pair: crossPair_2,
+                                        dividend: dividends[crossIdx2]
+                                    };
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (pair3_1 && pair3_2 && crossPoint3) break;
+                }
+                
+                if (pair3_1 && pair3_2 && crossPoint3) {
+                    const sum3 = pair3_1.dividend + pair3_2.dividend + crossPoint3.dividend;
+                    const ratio3 = ((pair3_1.dividend * pair3_2.dividend) / crossPoint3.dividend).toFixed(6);
+                    const addRatio3 = ((pair3_1.dividend + pair3_2.dividend) / crossPoint3.dividend).toFixed(6);
+                    
+                    analysis3 = {
+                        ratio: ratio3,
+                        addRatio: addRatio3,
+                        items: [
+                            {
+                                label: '1위',
+                                pair: pair3_1.pair,
+                                dividend: pair3_1.dividend,
+                                proportion: (pair3_1.dividend / sum3) * 100
+                            },
+                            {
+                                label: '2위',
+                                pair: pair3_2.pair,
+                                dividend: pair3_2.dividend,
+                                proportion: (pair3_2.dividend / sum3) * 100
+                            },
+                            {
+                                label: '교차점',
+                                pair: crossPoint3.pair,
+                                dividend: crossPoint3.dividend,
+                                proportion: (crossPoint3.dividend / sum3) * 100
+                            }
+                        ]
+                    };
+                }
+            }
+            
+            // 빈도 분석
+            const allCircledNums = [];
+            for (let char of inputData) {
+                if (circledNumbers.includes(char)) {
+                    allCircledNums.push(char);
+                }
+            }
+            
+            const lines = [];
+            for (let i = 0; i < allCircledNums.length; i += 6) {
+                const lineNums = allCircledNums.slice(i, i + 6);
+                if (lineNums.length > 0) {
+                    lines.push(lineNums.join(' '));
+                }
+            }
+            
+            const countNumbers = (text) => {
+                const counts = {};
+                circledNumbers.forEach(num => {
+                    const matches = text.match(new RegExp(num, 'g'));
+                    counts[num] = matches ? matches.length : 0;
+                });
+                return counts;
+            };
+
+            const lines1to3 = lines.slice(0, 3).join('\n');
+            const result1to3 = countNumbers(lines1to3);
+            const lines4to6 = lines.slice(3, 6).join('\n');
+            const result4to6 = countNumbers(lines4to6);
+            const lines7to10 = lines.slice(6, 10).join('\n');
+            const result7to10 = countNumbers(lines7to10);
+            const lines1to10 = lines.slice(0, 10).join('\n');
+            const result1to10 = countNumbers(lines1to10);
+
+            let result11to13 = null, result14to16 = null, result17to20 = null, result11to20 = null, resultCumulative20 = null;
+            if (lines.length > 10) {
+                result11to13 = countNumbers(lines.slice(10, 13).join('\n'));
+                result14to16 = countNumbers(lines.slice(13, 16).join('\n'));
+                result17to20 = countNumbers(lines.slice(16, 20).join('\n'));
+                result11to20 = countNumbers(lines.slice(10, 20).join('\n'));
+                resultCumulative20 = countNumbers(lines.slice(0, 20).join('\n'));
+            }
+
+            let result21to23 = null, result24to26 = null, result27to30 = null, result21to30 = null, resultCumulative30 = null;
+            if (lines.length > 20) {
+                result21to23 = countNumbers(lines.slice(20, 23).join('\n'));
+                result24to26 = countNumbers(lines.slice(23, 26).join('\n'));
+                result27to30 = countNumbers(lines.slice(26, 30).join('\n'));
+                result21to30 = countNumbers(lines.slice(20, 30).join('\n'));
+                resultCumulative30 = countNumbers(lines.slice(0, 30).join('\n'));
+            }
+
+            let result31to33 = null, result34to36 = null, result37to40 = null, result31to40 = null, resultCumulative40 = null;
+            if (lines.length > 30) {
+                result31to33 = countNumbers(lines.slice(30, 33).join('\n'));
+                result34to36 = countNumbers(lines.slice(33, 36).join('\n'));
+                result37to40 = countNumbers(lines.slice(36, 40).join('\n'));
+                result31to40 = countNumbers(lines.slice(30, 40).join('\n'));
+                resultCumulative40 = countNumbers(lines.slice(0, 40).join('\n'));
+            }
+
+            let result41to43 = null, result44to46 = null, result47to50 = null, result41to50 = null, resultCumulative50 = null;
+            if (lines.length > 40) {
+                result41to43 = countNumbers(lines.slice(40, 43).join('\n'));
+                result44to46 = countNumbers(lines.slice(43, 46).join('\n'));
+                result47to50 = countNumbers(lines.slice(46, 50).join('\n'));
+                result41to50 = countNumbers(lines.slice(40, 50).join('\n'));
+                resultCumulative50 = countNumbers(lines.slice(0, 50).join('\n'));
+            }
+
+            results = {
+                first10: { section1: result1to3, section2: result4to6, section3: result7to10, all: result1to10 },
+                second10: result11to20 ? { section1: result11to13, section2: result14to16, section3: result17to20, all: result11to20, cumulative: resultCumulative20 } : null,
+                third10: result21to30 ? { section1: result21to23, section2: result24to26, section3: result27to30, all: result21to30, cumulative: resultCumulative30 } : null,
+                fourth10: result31to40 ? { section1: result31to33, section2: result34to36, section3: result37to40, all: result31to40, cumulative: resultCumulative40 } : null,
+                fifth10: result41to50 ? { section1: result41to43, section2: result44to46, section3: result47to50, all: result41to50, cumulative: resultCumulative50 } : null
+            };
+
+            renderResults();
+            
+            // index2222 분석 실행
+            setTimeout(function() {
+                try {
+                    analyzeData2();
+                } catch(e) {
+                    console.error('index2222 오류:', e);
+                }
+            }, 150);
+        }
+
+        function getGradientColor(count, minCount, maxCount) {
+            if (maxCount === 0) return 'rgb(96, 165, 250)';
+            const ratio = count / maxCount;
+            let r, g, b;
+            if (ratio <= 0.5) {
+                const normalizedRatio = ratio * 2;
+                r = Math.round(96 + (255 - 96) * normalizedRatio);
+                g = Math.round(165 + (255 - 165) * normalizedRatio);
+                b = Math.round(250 + (255 - 250) * normalizedRatio);
+            } else {
+                const normalizedRatio = (ratio - 0.5) * 2;
+                r = Math.round(255 + (239 - 255) * normalizedRatio);
+                g = Math.round(255 + (68 - 255) * normalizedRatio);
+                b = Math.round(255 + (68 - 255) * normalizedRatio);
+            }
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function getAddRatioColor(value, minValue, maxValue) {
+            if (value < minValue) value = minValue;
+            if (value > maxValue) value = maxValue;
+            const ratio = (value - minValue) / (maxValue - minValue);
+            let r, g, b;
+            if (ratio <= 0.5) {
+                const normalizedRatio = ratio * 2;
+                r = Math.round(96 + (255 - 96) * normalizedRatio);
+                g = Math.round(165 + (255 - 165) * normalizedRatio);
+                b = Math.round(250 + (255 - 250) * normalizedRatio);
+            } else {
+                const normalizedRatio = (ratio - 0.5) * 2;
+                r = Math.round(255 + (239 - 255) * normalizedRatio);
+                g = Math.round(255 + (68 - 255) * normalizedRatio);
+                b = Math.round(255 + (68 - 255) * normalizedRatio);
+            }
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function getDividendColor(dividend) {
+            if (dividend <= 1.0) {
+                return 'rgb(96, 165, 250)';
+            } else if (dividend >= 5.0 && dividend < 7.0) {
+                return 'rgb(251, 146, 60)';
+            } else if (dividend >= 7.0) {
+                return 'rgb(239, 68, 68)';
+            } else {
+                return 'transparent';
+            }
+        }
+
+        function getTotalRatioColor(value) {
+            if (value < 100) {
+                return 'rgb(239, 68, 68)'; // 빨간색
+            } else if (value >= 100 && value < 200) {
+                return 'rgb(251, 146, 60)'; // 주황색
+            } else {
+                return 'white'; // 하얀색
+            }
+        }
+
+        function renderTable(data, title, hasCumulative = false) {
+            if (!data) return '';
+            const circledNumbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬', '⑭', '⑮', '⑯'];
+            const getMax = (dataObj) => Math.max(...Object.values(dataObj));
+            const maxValues = {
+                section1: getMax(data.section1), section2: getMax(data.section2),
+                section3: getMax(data.section3), all: getMax(data.all)
+            };
+            if (hasCumulative && data.cumulative) maxValues.cumulative = getMax(data.cumulative);
+            const colWidth = hasCumulative ? '9%' : '11%';
+            const colWidthValue = hasCumulative ? '11%' : '14%';
+
+            let html = `<div class="table-container">
+                <div class="table-title">${title}</div>
+                <table>
+                    <colgroup>
+                        <col style="width: ${colWidth}" /><col style="width: ${colWidthValue}" />
+                        <col style="width: ${colWidth}" /><col style="width: ${colWidthValue}" />
+                        <col style="width: ${colWidth}" /><col style="width: ${colWidthValue}" />
+                        <col style="width: ${colWidth}" /><col style="width: ${colWidthValue}" />
+                        ${hasCumulative ? `<col style="width: ${colWidth}" /><col style="width: ${colWidthValue}" />` : ''}
+                    </colgroup>
+                    <thead><tr>
+                        <th>첫부분</th><th></th>
+                        <th>중간</th><th></th>
+                        <th>아랫부분</th><th></th>
+                        <th>전체</th><th></th>
+                        ${hasCumulative ? `<th class="orange-bg">누적전체</th><th class="orange-bg"></th>` : ''}
+                    </tr></thead><tbody>`;
+
+            circledNumbers.forEach(num => {
+                html += `<tr>
+                    <td class="yellow-bg">${num}</td>
+                    <td class="value-cell" style="background-color: ${getGradientColor(data.section1[num], 0, maxValues.section1)}">${data.section1[num]}</td>
+                    <td class="yellow-bg">${num}</td>
+                    <td class="value-cell" style="background-color: ${getGradientColor(data.section2[num], 0, maxValues.section2)}">${data.section2[num]}</td>
+                    <td class="yellow-bg">${num}</td>
+                    <td class="value-cell" style="background-color: ${getGradientColor(data.section3[num], 0, maxValues.section3)}">${data.section3[num]}</td>
+                    <td class="yellow-bg">${num}</td>
+                    <td class="value-cell" style="background-color: ${getGradientColor(data.all[num], 0, maxValues.all)}">${data.all[num]}</td>
+                    ${hasCumulative && data.cumulative ? `
+                        <td class="yellow-bg">${num}</td>
+                        <td class="value-cell orange-bg" style="background-color: ${getGradientColor(data.cumulative[num], 0, maxValues.cumulative)}">${data.cumulative[num]}</td>
+                    ` : ''}
+                </tr>`;
+            });
+            return html + `</tbody></table></div>`;
+        }
+
+        function renderResults() {
+            let html = '<div>';
+
+            // 교차점분석1
+            if (analysis1) {
+                html += `<div class="analysis-box">
+                    <div class="analysis-title">📊 교차점분석1</div>
+                    <div class="cards-grid">`;
+                analysis1.items.forEach((item, idx) => {
+                    const bgColor = idx === 0 ? getDividendColor(item.dividend) : 'transparent';
+                    html += `<div class="card">
+                        <div class="card-label">${item.label}</div>
+                        <div class="number-display">
+                            ${item.pair.split('').map(c => `<span>${c}</span>`).join('')}
+                        </div>
+                        <div class="dividend-value" style="background-color: ${bgColor}">${item.dividend}</div>
+                        <div class="proportion-value">${item.proportion.toFixed(2)}%</div>
+                    </div>`;
+                });
+                html += `</div><div class="ratio-grid">
+                    <div class="ratio-box yellow">
+                        <div class="ratio-label" style="color: #78716C">비율</div>
+                        <div class="ratio-value" style="color: #F59E0B">${analysis1.ratio}</div>
+                        <div class="ratio-formula" style="color: #78716C">= (${analysis1.items[0].dividend} × ${analysis1.items[1].dividend}) / ${analysis1.items[2].dividend}</div>
+                    </div>
+                    <div class="ratio-box" style="background-color: ${getAddRatioColor(parseFloat(analysis1.addRatio), 0.1, 2.0)}">
+                        <div class="ratio-label" style="color: black">더하기 비율</div>
+                        <div class="ratio-value" style="color: black">${analysis1.addRatio}</div>
+                        <div class="ratio-formula" style="color: black">= (${analysis1.items[0].dividend} + ${analysis1.items[1].dividend}) / ${analysis1.items[2].dividend}</div>
+                    </div>
+                </div></div>`;
+            }
+
+            // 교차점분석2
+            if (analysis2) {
+                html += `<div class="analysis-box">
+                    <div class="analysis-title">📈 교차점분석2</div>
+                    <div class="cards-grid">`;
+                analysis2.items.forEach(item => {
+                    html += `<div class="card">
+                        <div class="card-label">${item.label}</div>
+                        <div class="number-display">
+                            ${item.pair.split('').map(c => `<span>${c}</span>`).join('')}
+                        </div>
+                        <div class="dividend-value">${item.dividend}</div>
+                        <div class="proportion-value">${item.proportion.toFixed(2)}%</div>
+                    </div>`;
+                });
+                html += `</div><div class="ratio-grid">
+                    <div class="ratio-box yellow">
+                        <div class="ratio-label" style="color: #78716C">비율</div>
+                        <div class="ratio-value" style="color: #F59E0B">${analysis2.ratio}</div>
+                        <div class="ratio-formula" style="color: #78716C">= (${analysis2.items[0].dividend} × ${analysis2.items[1].dividend}) / ${analysis2.items[2].dividend}</div>
+                    </div>
+                    <div class="ratio-box" style="background-color: ${getAddRatioColor(parseFloat(analysis2.addRatio), 0.1, 2.0)}">
+                        <div class="ratio-label" style="color: black">더하기 비율</div>
+                        <div class="ratio-value" style="color: black">${analysis2.addRatio}</div>
+                        <div class="ratio-formula" style="color: black">= (${analysis2.items[0].dividend} + ${analysis2.items[1].dividend}) / ${analysis2.items[2].dividend}</div>
+                    </div>
+                </div></div>`;
+            }
+
+            // 교차점분석3
+            if (analysis3) {
+                html += `<div class="analysis-box">
+                    <div class="analysis-title">🎯 교차점분석3</div>
+                    <div class="cards-grid">`;
+                analysis3.items.forEach(item => {
+                    html += `<div class="card">
+                        <div class="card-label">${item.label}</div>
+                        <div class="number-display">
+                            ${item.pair.split('').map(c => `<span>${c}</span>`).join('')}
+                        </div>
+                        <div class="dividend-value">${item.dividend}</div>
+                        <div class="proportion-value">${item.proportion.toFixed(2)}%</div>
+                    </div>`;
+                });
+                html += `</div><div class="ratio-grid">
+                    <div class="ratio-box yellow">
+                        <div class="ratio-label" style="color: #78716C">비율</div>
+                        <div class="ratio-value" style="color: #F59E0B">${analysis3.ratio}</div>
+                        <div class="ratio-formula" style="color: #78716C">= (${analysis3.items[0].dividend} × ${analysis3.items[1].dividend}) / ${analysis3.items[2].dividend}</div>
+                    </div>
+                    <div class="ratio-box" style="background-color: ${getAddRatioColor(parseFloat(analysis3.addRatio), 0.1, 2.0)}">
+                        <div class="ratio-label" style="color: black">더하기 비율</div>
+                        <div class="ratio-value" style="color: black">${analysis3.addRatio}</div>
+                        <div class="ratio-formula" style="color: black">= (${analysis3.items[0].dividend} + ${analysis3.items[1].dividend}) / ${analysis3.items[2].dividend}</div>
+                    </div>
+                </div></div>`;
+            }
+
+            // 합산 비율
+            if (analysis1 && analysis2 && analysis3) {
+                const totalAddRatio = (parseFloat(analysis1.addRatio) + parseFloat(analysis2.addRatio) + parseFloat(analysis3.addRatio)).toFixed(6);
+                html += `<div class="total-ratio-box" style="background-color: ${getAddRatioColor(parseFloat(totalAddRatio), 2.0, 5.0)}">
+                    <div class="total-ratio-title">📊 합산 비율</div>
+                    <div class="total-ratio-value">${totalAddRatio}</div>
+                    <div class="total-ratio-formula">= ${analysis1.addRatio} + ${analysis2.addRatio} + ${analysis3.addRatio}</div>
+                </div>`;
+                
+                // 복승비율
+                const bokseungRatio = (analysis3.items[2].dividend / analysis1.items[0].dividend).toFixed(6);
+                html += `<div class="total-ratio-box" style="background-color: ${getTotalRatioColor(parseFloat(bokseungRatio))}">
+                    <div class="total-ratio-title">🎯 복승비율</div>
+                    <div class="total-ratio-value">${bokseungRatio}</div>
+                    <div class="total-ratio-formula">= ${analysis3.items[2].dividend} ÷ ${analysis1.items[0].dividend}</div>
+                </div>`;
+            }
+
+            // 색상 안내
+            html += `<div class="info-box">
+                <div class="info-title">색상 안내</div>
+                <div class="gradient-bar">
+                    <div class="gradient-box">
+                        <div class="color-sample" style="background: rgb(96, 165, 250)"></div>
+                        <span>0 (최저)</span>
+                    </div>
+                    <div class="gradient-fill"></div>
+                    <div class="gradient-box">
+                        <div class="color-sample" style="background: rgb(239, 68, 68)"></div>
+                        <span>최고</span>
+                    </div>
+                </div>
+                <div class="info-text">각 구간별로 상대적인 빈도에 따라 색상이 그라데이션으로 표시됩니다.</div>
+            </div>`;
+
+            html += renderTable(results.first10, "1-10줄 분석");
+            if (results.second10) html += renderTable(results.second10, "11-20줄 분석", true);
+            if (results.third10) html += renderTable(results.third10, "21-30줄 분석", true);
+            if (results.fourth10) html += renderTable(results.fourth10, "31-40줄 분석", true);
+            if (results.fifth10) html += renderTable(results.fifth10, "41-50줄 분석", true);
+
+            document.getElementById('results').innerHTML = html + '</div>';
+        }
+
+
+        // ========== index2222 스크립트 ========== 
+        // 분석 이력 저장
+        let analysisHistory2 = [];
+
+        // 동그라미 숫자를 일반 숫자로 변환
+        function circleToNumber(circle) {
+            const circleMap = {
+                '①': 1, '②': 2, '③': 3, '④': 4, '⑤': 5,
+                '⑥': 6, '⑦': 7, '⑧': 8, '⑨': 9, '⑩': 10,
+                '⑪': 11, '⑫': 12, '⑬': 13, '⑭': 14, '⑮': 15, '⑯': 16
+            };
+            return circleMap[circle] || null;
+        }
+
+        // 일반 숫자를 동그라미 숫자로 변환
+        function numberToCircle(num) {
+            const numberMap = {
+                1: '①', 2: '②', 3: '③', 4: '④', 5: '⑤',
+                6: '⑥', 7: '⑦', 8: '⑧', 9: '⑨', 10: '⑩',
+                11: '⑪', 12: '⑫', 13: '⑬', 14: '⑭', 15: '⑮', 16: '⑯'
+            };
+            return numberMap[num] || num.toString();
+        }
+
+        function analyzeData2() {
+            const input = document.getElementById('inputData').value.trim();
+            
+            if (!input) {
+                alert('데이터를 입력해주세요.');
+                return;
+            }
+
+            // 데이터 파싱
+            const pairs = [];
+            const lines = input.split('\n');
+            
+            lines.forEach(line => {
+                const items = line.split(/\s+/);
+                for (let i = 0; i < items.length - 1; i += 2) {
+                    if (items[i] && items[i + 1]) {
+                        const pair = items[i].trim();
+                        const odds = parseFloat(items[i + 1]);
+                        if (pair.length >= 2 && !isNaN(odds)) {
+                            pairs.push({ pair, odds });
+                        }
+                    }
+                }
+            });
+
+            if (pairs.length === 0) {
+                alert('유효한 데이터가 없습니다.');
+                return;
+            }
+
+            // 전체 배당 합계
+            const totalOdds = pairs.reduce((sum, item) => sum + item.odds, 0);
+
+            // 동그라미 숫자별로 그룹화
+            const groupedData = {};
+            
+            pairs.forEach(item => {
+                const chars = item.pair.split('');
+                const numbers = chars.map(c => circleToNumber(c)).filter(n => n !== null);
+                
+                if (numbers.length >= 2) {
+                    numbers.forEach(num => {
+                        if (!groupedData[num]) {
+                            groupedData[num] = [];
+                        }
+                        
+                        groupedData[num].push({
+                            pair: item.pair,
+                            numbers: numbers,
+                            odds: item.odds
+                        });
+                    });
+                }
+            });
+
+            // 교차점 분석
+            const crossPointSets = analyzeCrossPoints(pairs);
+
+            // 분석 이력에 저장
+            analysisHistory2.push({
+                timestamp: new Date(),
+                crossPointSets: crossPointSets,
+                totalOdds: totalOdds
+            });
+
+            // 결과 표시
+            displayResults(groupedData, totalOdds, crossPointSets);
+            
+            // 이력 카운터 업데이트
+            updateHistoryCounter2();
+        }
+
+        function analyzeCrossPoints(pairs) {
+            const crossPointSets = [];
+            const usedIndices = new Set();
+            const usedNumbers = new Set(); // 사용된 모든 숫자 추적
+            
+            let pairCounter = 1; // 짝 순번 (1짝, 2짝, 3짝...)
+            let iterations = 0;
+            
+            while (iterations < 3 && usedIndices.size < pairs.length - 1) {
+                // 1번째 짝 찾기 (사용된 숫자 제외)
+                let firstIdx = -1;
+                let firstNumbers = null;
+                for (let i = 0; i < pairs.length; i++) {
+                    if (!usedIndices.has(i)) {
+                        const chars = pairs[i].pair.split('');
+                        const numbers = chars.map(c => circleToNumber(c)).filter(n => n !== null);
+                        
+                        // 사용된 숫자가 하나도 포함되지 않은 짝 찾기
+                        if (numbers.length >= 2 && !numbers.some(n => usedNumbers.has(n))) {
+                            firstIdx = i;
+                            firstNumbers = numbers;
+                            break;
+                        }
+                    }
+                }
+                
+                if (firstIdx === -1) break;
+                
+                // 2번째 짝 찾기 (사용된 숫자 제외, 1번째 짝과 공통 숫자 있어야 함)
+                let secondIdx = -1;
+                let secondNumbers = null;
+                for (let i = 0; i < pairs.length; i++) {
+                    if (i !== firstIdx && !usedIndices.has(i)) {
+                        const chars = pairs[i].pair.split('');
+                        const numbers = chars.map(c => circleToNumber(c)).filter(n => n !== null);
+                        
+                        // 1번째 짝과 공통 숫자가 있고, 사용된 숫자가 포함되지 않은 짝
+                        const hasCommon = numbers.some(n => firstNumbers.includes(n));
+                        const hasUsedNumber = numbers.some(n => usedNumbers.has(n) && !firstNumbers.includes(n));
+                        
+                        if (numbers.length >= 2 && hasCommon && !hasUsedNumber) {
+                            secondIdx = i;
+                            secondNumbers = numbers;
+                            break;
+                        }
+                    }
+                }
+                
+                if (secondIdx === -1) break;
+                
+                const first = pairs[firstIdx];
+                const second = pairs[secondIdx];
+                
+                // 공통 번호 찾기
+                const commonNumbers = firstNumbers.filter(n => secondNumbers.includes(n));
+                
+                // 교차점 숫자 (공통 번호 제외)
+                const crossNumbers = [
+                    ...firstNumbers.filter(n => !commonNumbers.includes(n)),
+                    ...secondNumbers.filter(n => !commonNumbers.includes(n))
+                ];
+                
+                // 교차점 짝 찾기 (순서 상관없이, 중복 허용)
+                let crossPoint = null;
+                if (crossNumbers.length === 2) {
+                    const [num1, num2] = crossNumbers;
+                    crossPoint = pairs.find((p) => {
+                        const pNumbers = p.pair.split('').map(c => circleToNumber(c)).filter(n => n !== null);
+                        return (pNumbers.includes(num1) && pNumbers.includes(num2)) ||
+                               (pNumbers.includes(num2) && pNumbers.includes(num1));
+                    });
+                }
+                
+                crossPointSets.push({
+                    first: {
+                        numbers: firstNumbers,
+                        pair: first.pair,
+                        odds: first.odds,
+                        pairNumber: pairCounter // 짝 번호
+                    },
+                    second: {
+                        numbers: secondNumbers,
+                        pair: second.pair,
+                        odds: second.odds,
+                        pairNumber: pairCounter + 1 // 짝 번호
+                    },
+                    crossPoint: crossPoint ? {
+                        numbers: crossNumbers,
+                        pair: crossPoint.pair,
+                        odds: crossPoint.odds,
+                        formula: `=(${first.odds.toFixed(1)}*${second.odds.toFixed(1)})/${crossPoint.odds.toFixed(1)}`,
+                        result: ((first.odds * second.odds) / crossPoint.odds).toFixed(3)
+                    } : {
+                        numbers: crossNumbers,
+                        pair: '없음',
+                        odds: null,
+                        formula: '교차점 없음',
+                        result: null
+                    }
+                });
+                
+                // 사용한 인덱스 표시
+                usedIndices.add(firstIdx);
+                usedIndices.add(secondIdx);
+                if (crossPoint) {
+                    const crossIdx = pairs.findIndex(p => p.pair === crossPoint.pair);
+                    if (crossIdx !== -1) usedIndices.add(crossIdx);
+                }
+                
+                // 사용된 숫자 추가 (누적)
+                firstNumbers.forEach(n => usedNumbers.add(n));
+                secondNumbers.forEach(n => usedNumbers.add(n));
+                if (crossPoint && crossPoint.odds) {
+                    crossNumbers.forEach(n => usedNumbers.add(n));
+                }
+                
+                pairCounter += 2; // 다음 세트는 3짝, 4짝...
+                iterations++;
+            }
+            
+            return crossPointSets;
+        }
+
+        function displayResults(groupedData, totalOdds, crossPointSets) {
+            const resultsDiv = document.getElementById('results2');
+            
+            if (Object.keys(groupedData).length === 0) {
+                resultsDiv.innerHTML = '<div class="no-data">분석할 데이터가 없습니다.</div>';
+                return;
+            }
+
+            let html = '';
+            
+            // 숫자 순서대로 정렬
+            const sortedNumbers = Object.keys(groupedData).map(Number).sort((a, b) => a - b);
+            
+            // 각 숫자별 합계 계산
+            const summaryData = sortedNumbers.map(num => {
+                const items = groupedData[num];
+                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);
+                const sumRatio = (sumOdds / (totalOdds * 2) * 100);
+                return {
+                    num: num,
+                    count: items.length,
+                    sumOdds: sumOdds,
+                    sumRatio: sumRatio
+                };
+            });
+
+            summaryData.sort((a, b) => a.sumRatio - b.sumRatio);
+
+            // 전체 요약 테이블
+            html += `
+                <div class="number-section summary">
+                    <div class="number-header">
+                        <span class="number-badge red">📊</span>
+                        <span>전체 숫자별 배당 합계 (비중 낮은 순)</span>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead class="red">
+                                <tr>
+                                    <th>동그라미<br/>숫자</th>
+                                    <th>조합<br/>개수</th>
+                                    <th>배당<br/>합계</th>
+                                    <th>비중<br/>합계(%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            summaryData.forEach(data => {
+                html += `
+                    <tr>
+                        <td class="pair-cell">${data.num}</td>
+                        <td>${data.count}</td>
+                        <td class="odds-cell">${data.sumOdds.toFixed(1)}</td>
+                        <td class="ratio-cell">${data.sumRatio.toFixed(2)}%</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                    </div>
+                    <div class="summary">
+                        <div class="summary-text">
+                            💰 전체 배당 합계: ${totalOdds.toFixed(1)}
+                        </div>
+                    </div>
+                    <div class="summary" style="margin-top: 10px; background: #e8f5e9; border-left-color: #4caf50;">
+                        <div class="summary-text" style="color: #2e7d32;">
+                            📊 비중 통계 분석 (배당합계 기준)<br/>
+                            • 평균: ${(summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length).toFixed(2)}<br/>
+                            • 표준편차: ${(() => {
+                                const mean = summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length;
+                                const variance = summaryData.reduce((sum, d) => sum + Math.pow(d.sumOdds - mean, 2), 0) / summaryData.length;
+                                return Math.sqrt(variance).toFixed(2);
+                            })()}<br/>
+                            • 최대-최소 차이: ${(Math.max(...summaryData.map(d => d.sumOdds)) - Math.min(...summaryData.map(d => d.sumOdds))).toFixed(2)}
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">📈 동그라미 숫자별 비중 분포</div>
+            `;
+            
+            // 그래프 생성 (비중 낮은 순서로 이미 정렬되어 있음)
+            const maxRatio = Math.max(...summaryData.map(d => d.sumRatio));
+            summaryData.forEach(data => {
+                const widthPercent = (data.sumRatio / maxRatio * 100);
+                html += `
+                    <div class="chart-bar">
+                        <div class="chart-label">${data.num}</div>
+                        <div class="chart-bar-container">
+                            <div class="chart-bar-fill" style="width: ${widthPercent}%">
+                                <span class="chart-value">${data.sumRatio.toFixed(2)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+
+            // 교차점 분석 테이블
+            if (crossPointSets.length > 0) {
+                html += `
+                    <div class="number-section crosspoint">
+                        <div class="number-header">
+                            <span class="number-badge blue">⚡</span>
+                            <span>교차점 분석</span>
+                        </div>
+                `;
+                
+                crossPointSets.forEach((set, idx) => {
+                    const totalSetOdds = set.first.odds + set.second.odds + (set.crossPoint.odds || 0);
+                    const firstRatio = set.crossPoint.odds ? (set.first.odds / totalSetOdds * 100).toFixed(2) : '-';
+                    const secondRatio = set.crossPoint.odds ? (set.second.odds / totalSetOdds * 100).toFixed(2) : '-';
+                    const crossRatio = set.crossPoint.odds ? (set.crossPoint.odds / totalSetOdds * 100).toFixed(2) : '-';
+                    
+                    html += `
+                        <div class="crosspoint-title">${idx + 1}번째 짝</div>
+                        <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead class="blue">
+                                <tr>
+                                    <th></th>
+                                    <th>${set.first.pairNumber}짝</th>
+                                    <th>${set.second.pairNumber}짝</th>
+                                    <th>교차점</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 600;">번호</td>
+                                    <td class="pair-cell">${set.first.numbers.join(',')}</td>
+                                    <td class="pair-cell">${set.second.numbers.join(',')}</td>
+                                    <td class="pair-cell">${set.crossPoint.numbers.join(',')}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">배당</td>
+                                    <td class="odds-cell">${set.first.odds.toFixed(1)}</td>
+                                    <td class="odds-cell">${set.second.odds.toFixed(1)}</td>
+                                    <td class="odds-cell">${set.crossPoint.odds ? set.crossPoint.odds.toFixed(1) : '없음'}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">비중(%)</td>
+                                    <td class="ratio-cell">${firstRatio}${firstRatio !== '-' ? '%' : ''}</td>
+                                    <td class="ratio-cell">${secondRatio}${secondRatio !== '-' ? '%' : ''}</td>
+                                    <td class="ratio-cell">${crossRatio}${crossRatio !== '-' ? '%' : ''}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="font-weight: 600;">계산식</td>
+                                    <td>
+                                        <div class="formula-cell">${set.crossPoint.formula}</div>
+                                        ${set.crossPoint.result ? `<div class="result-cell">${set.crossPoint.result}</div>` : ''}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        ${idx < crossPointSets.length - 1 ? '<div style="height: 20px;"></div>' : ''}
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+
+            // 각 숫자별 상세
+            sortedNumbers.forEach(num => {
+                const items = groupedData[num];
+                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);
+                
+                html += `
+                    <div class="number-section">
+                        <div class="number-header">
+                            <span class="number-badge">${numberToCircle(num)}</span>
+                            <span>${numberToCircle(num)}번이 포함된 조합</span>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>순서</th>
+                                    <th>동그라미<br/>안의 숫자</th>
+                                    <th>상대<br/>숫자</th>
+                                    <th>배당</th>
+                                    <th>배당<br/>비중(%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                items.forEach((item, index) => {
+                    const otherNumber = item.numbers.find(n => n !== num);
+                    const pageRatio = (item.odds / sumOdds * 100).toFixed(2);
+                    
+                    html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td class="pair-cell">${item.numbers.join(', ')}</td>
+                            <td class="pair-cell">${otherNumber}</td>
+                            <td class="odds-cell">${item.odds.toFixed(1)}</td>
+                            <td class="ratio-cell">${pageRatio}%</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                        </div>
+                        
+                        <div class="summary">
+                            <div class="summary-text">
+                                📌 ${numberToCircle(num)}번 합계: 배당 ${sumOdds.toFixed(1)} / 조합 개수 ${items.length}개
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        function clearAll2() {
+            document.getElementById('inputData').value = '';
+            document.getElementById('results2').innerHTML = '';
+        }
+
+        function updateHistoryCounter2() {
+            const counter = document.getElementById('historyCounter2');
+            if (counter) {
+                counter.textContent = `저장된 회차: ${analysisHistory2.length}개`;
+            }
+        }
+
+        function clearHistory2() {
+            if (analysisHistory2.length === 0) {
+                alert('저장된 회차가 없습니다.');
+                return;
+            }
+            
+            if (confirm(`${analysisHistory2.length}개 회차를 모두 삭제하시겠습니까?`)) {
+                analysisHistory2 = [];
+                updateHistoryCounter2();
+                alert('모든 회차가 삭제되었습니다.');
+            }
+        }
+
+        async function downloadExcel2() {
+            if (analysisHistory2.length === 0) {
+                alert('저장된 회차가 없습니다. 먼저 분석을 진행해주세요.');
+                return;
+            }
+
+            // SheetJS 라이브러리 로드 확인
+            if (typeof XLSX === 'undefined') {
+                alert('엑셀 라이브러리를 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+
+            // 파일명 입력 받기
+            const defaultFileName = `배당분석_${new Date().toISOString().slice(0, 10)}`;
+            const userFileName = prompt('파일명을 입력하세요 (확장자 제외):', defaultFileName);
+            
+            if (userFileName === null) {
+                return;
+            }
+            
+            const fileName = (userFileName.trim() || defaultFileName) + '.xlsx';
+
+            try {
+                // 엑셀 데이터 생성
+                const ws_data = [];
+                
+                // 최대 숫자 개수 계산
+                let maxNumbers = 0;
+                analysisHistory2.forEach(history => {
+                    if (history.crossPointSets && history.crossPointSets.length > 0) {
+                        // 각 history의 고유 숫자 개수 계산
+                        const uniqueNumbers = new Set();
+                        history.crossPointSets.forEach(set => {
+                            set.first.numbers.forEach(n => uniqueNumbers.add(n));
+                            set.second.numbers.forEach(n => uniqueNumbers.add(n));
+                            if (set.crossPoint && set.crossPoint.numbers) {
+                                set.crossPoint.numbers.forEach(n => uniqueNumbers.add(n));
+                            }
+                        });
+                        if (uniqueNumbers.size > maxNumbers) {
+                            maxNumbers = uniqueNumbers.size;
+                        }
+                    }
+                });
+                
+                // 헤더 1행
+                const header1 = ['', '', ''];
+                for (let i = 0; i < 3; i++) {
+                    header1.push(`${i + 1}번째 짝`, '', '', '', '', '', '', '', '');
+                }
+                
+                // BA열까지 빈 칸 채우기 (BA = 53번째 열, 인덱스 52)
+                while (header1.length < 52) {
+                    header1.push('');
+                }
+                
+                // 숫자 (BA열)
+                header1.push('숫자');
+                
+                // 16칸 띄우기
+                const oddsHeaderIndex = 52 + 16;
+                while (header1.length < oddsHeaderIndex) {
+                    header1.push('');
+                }
+                
+                // 배당합계
+                header1.push('배당합계');
+                
+                // 16칸 띄우기
+                const ratioHeaderIndex = oddsHeaderIndex + 16;
+                while (header1.length < ratioHeaderIndex) {
+                    header1.push('');
+                }
+                
+                // 비중(%)
+                header1.push('비중(%)');
+                
+                // 16칸 띄우기
+                const statsHeaderIndex = ratioHeaderIndex + 16;
+                while (header1.length < statsHeaderIndex) {
+                    header1.push('');
+                }
+                
+                // 빈 칸 1개
+                header1.push('');
+                
+                // 비중 통계 분석 (1칸씩 띄우기)
+                header1.push('평균');
+                header1.push('');
+                header1.push('표준편차');
+                header1.push('');
+                header1.push('최대-최소차이');
+                
+                ws_data.push(header1);
+                
+                // 헤더 2행
+                const header2 = ['', '', '테스트회차'];
+                for (let i = 0; i < 3; i++) {
+                    header2.push('1-1_번호', '1-2_번호', '배당', '2-1_번호', '2-2_번호', '배당', '교차점-1_번호', '교차점-2_번호', '배당');
+                }
+                
+                // BA열까지 빈 칸 채우기
+                while (header2.length < 52) {
+                    header2.push('');
+                }
+                
+                // 숫자들 (1, 2, 3, ...)
+                for (let i = 1; i <= maxNumbers; i++) {
+                    header2.push(i);
+                }
+                
+                // 16칸 띄우기 후 배당합계
+                while (header2.length < oddsHeaderIndex) {
+                    header2.push('');
+                }
+                for (let i = 1; i <= maxNumbers; i++) {
+                    header2.push(i);
+                }
+                
+                // 16칸 띄우기 후 비중
+                while (header2.length < ratioHeaderIndex) {
+                    header2.push('');
+                }
+                for (let i = 1; i <= maxNumbers; i++) {
+                    header2.push(i);
+                }
+                
+                ws_data.push(header2);
+                
+                // 데이터 행
+                analysisHistory2.forEach((history, idx) => {
+                    const row = ['', '', idx + 1];
+                    
+                    // 교차점 분석 데이터
+                    for (let i = 0; i < 3; i++) {
+                        if (i < history.crossPointSets.length) {
+                            const set = history.crossPointSets[i];
+                            row.push(
+                                set.first.numbers[0] || '',
+                                set.first.numbers[1] || '',
+                                set.first.odds || '',
+                                set.second.numbers[0] || '',
+                                set.second.numbers[1] || '',
+                                set.second.odds || '',
+                                set.crossPoint.odds ? (set.crossPoint.numbers[0] || '') : '없음',
+                                set.crossPoint.odds ? (set.crossPoint.numbers[1] || '') : '',
+                                set.crossPoint.odds || '없음'
+                            );
+                        } else {
+                            row.push('', '', '', '', '', '', '', '', '');
+                        }
+                    }
+                    
+                    // BA열까지 빈 칸 채우기
+                    while (row.length < 52) {
+                        row.push('');
+                    }
+                    
+                    // 숫자별 배당 합계 데이터 수집
+                    const numberSums = {};
+                    const numberCounts = {};
+                    history.crossPointSets.forEach(set => {
+                        // first 짝
+                        set.first.numbers.forEach(n => {
+                            if (!numberSums[n]) {
+                                numberSums[n] = 0;
+                                numberCounts[n] = 0;
+                            }
+                        });
+                        // second 짝
+                        set.second.numbers.forEach(n => {
+                            if (!numberSums[n]) {
+                                numberSums[n] = 0;
+                                numberCounts[n] = 0;
+                            }
+                        });
+                        // crossPoint
+                        if (set.crossPoint && set.crossPoint.numbers) {
+                            set.crossPoint.numbers.forEach(n => {
+                                if (!numberSums[n]) {
+                                    numberSums[n] = 0;
+                                    numberCounts[n] = 0;
+                                }
+                            });
+                        }
+                        
+                        // 배당 합산 (각 조합에서 해당 숫자가 포함된 만큼)
+                        set.first.numbers.forEach(n => {
+                            numberSums[n] += set.first.odds;
+                            numberCounts[n]++;
+                        });
+                        set.second.numbers.forEach(n => {
+                            numberSums[n] += set.second.odds;
+                            numberCounts[n]++;
+                        });
+                        if (set.crossPoint && set.crossPoint.odds) {
+                            set.crossPoint.numbers.forEach(n => {
+                                numberSums[n] += set.crossPoint.odds;
+                                numberCounts[n]++;
+                            });
+                        }
+                    });
+                    
+                    // 비중 낮은 순으로 정렬
+                    const totalOdds = Object.values(numberSums).reduce((sum, val) => sum + val, 0);
+                    const sortedNumbers = Object.keys(numberSums)
+                        .map(n => parseInt(n))
+                        .sort((a, b) => numberSums[a] - numberSums[b]);
+                    
+                    if (sortedNumbers.length > 0) {
+                        // 1. 숫자들
+                        sortedNumbers.forEach((num) => {
+                            row.push(num);
+                        });
+                        
+                        // 16칸 띄우기
+                        while (row.length < oddsHeaderIndex) {
+                            row.push('');
+                        }
+                        
+                        // 2. 배당합계들
+                        sortedNumbers.forEach((num) => {
+                            row.push(parseFloat(numberSums[num]).toFixed(1));
+                        });
+                        
+                        // 16칸 띄우기
+                        while (row.length < ratioHeaderIndex) {
+                            row.push('');
+                        }
+                        
+                        // 3. 비중들
+                        sortedNumbers.forEach((num) => {
+                            const ratio = (numberSums[num] / totalOdds * 100).toFixed(2);
+                            row.push(ratio);
+                        });
+                        
+                        // 16칸 띄우기
+                        while (row.length < statsHeaderIndex) {
+                            row.push('');
+                        }
+                        
+                        // 빈 칸 1개
+                        row.push('');
+                        
+                        // 4. 비중 통계 분석
+                        const oddsValues = sortedNumbers.map(num => numberSums[num]);
+                        const avg = oddsValues.reduce((a, b) => a + b, 0) / oddsValues.length;
+                        const variance = oddsValues.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / oddsValues.length;
+                        const stdDev = Math.sqrt(variance);
+                        const maxVal = Math.max(...oddsValues);
+                        const minVal = Math.min(...oddsValues);
+                        const diff = maxVal - minVal;
+                        
+                        row.push(avg.toFixed(2));
+                        row.push(''); // 1칸 띄우기
+                        row.push(stdDev.toFixed(2));
+                        row.push(''); // 1칸 띄우기
+                        row.push(diff.toFixed(2));
+                    }
+                    
+                    ws_data.push(row);
+                });
+                
+                // 워크시트 생성
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                
+                // 열 너비 설정
+                ws['!cols'] = [
+                    { wch: 5 }, { wch: 5 }, { wch: 12 },
+                    { wch: 10 }, { wch: 10 }, { wch: 10 },
+                    { wch: 10 }, { wch: 10 }, { wch: 10 },
+                    { wch: 12 }, { wch: 12 }, { wch: 10 },
+                    { wch: 10 }, { wch: 10 }, { wch: 10 },
+                    { wch: 10 }, { wch: 10 }, { wch: 10 },
+                    { wch: 12 }, { wch: 12 }, { wch: 10 },
+                    { wch: 10 }, { wch: 10 }, { wch: 10 },
+                    { wch: 10 }, { wch: 10 }, { wch: 10 },
+                    { wch: 12 }, { wch: 12 }, { wch: 10 }
+                ];
+                
+                // 워크북 생성
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                
+                // 파일 다운로드
+                XLSX.writeFile(wb, fileName);
+                
+                alert(`${analysisHistory2.length}개 회차가 "${fileName}" 파일로 저장되었습니다.`);
+            } catch (error) {
+                console.error('Excel export error:', error);
+                alert('엑셀 저장 중 오류가 발생했습니다.');
+            }
+        }
+    
+        // ========== 스크립트 끝 ========== 
+        </script>
+</body>
+</html>
