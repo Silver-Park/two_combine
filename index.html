@@ -782,6 +782,60 @@
             }
         }
     
+
+
+        /* 플로팅 버튼 스타일 */
+        .floating-buttons {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .float-btn {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .float-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .float-btn:active {
+            transform: translateY(0);
+        }
+
+        .float-btn.secondary {
+            background: linear-gradient(135deg, #1e88e5 0%, #00acc1 100%);
+        }
+
+        @media (max-width: 640px) {
+            .floating-buttons {
+                right: 0.5rem;
+                bottom: 0.5rem;
+            }
+            
+            .float-btn {
+                width: 3rem;
+                height: 3rem;
+                font-size: 1.25rem;
+            }
+        }
 </style>
 </head>
 <body>
@@ -819,6 +873,17 @@
 
         <div class="idx2-container">
             <div id="results2" class="results"></div>
+        </div>
+
+
+        <!-- 플로팅 버튼 -->
+        <div class="floating-buttons">
+            <button class="float-btn secondary" onclick="scrollToSection2()" title="배당율 상세 분석으로 이동">
+                ⬇️
+            </button>
+            <button class="float-btn" onclick="scrollToTop()" title="맨 위로">
+                ⬆️
+            </button>
         </div>
     </div>
 
@@ -1736,234 +1801,41 @@
             return crossPointSets;
         }
 
-        function displayResults(groupedData, totalOdds, crossPointSets) {
-            const resultsDiv = document.getElementById('results2');
-            
-            if (Object.keys(groupedData).length === 0) {
-                resultsDiv.innerHTML = '<div class="no-data">분석할 데이터가 없습니다.</div>';
-                return;
-            }
-
-            let html = '';
-            
-            // 숫자 순서대로 정렬
-            const sortedNumbers = Object.keys(groupedData).map(Number).sort((a, b) => a - b);
-            
-            // 각 숫자별 합계 계산
-            const summaryData = sortedNumbers.map(num => {
-                const items = groupedData[num];
-                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);
-                const sumRatio = (sumOdds / (totalOdds * 2) * 100);
-                return {
-                    num: num,
-                    count: items.length,
-                    sumOdds: sumOdds,
-                    sumRatio: sumRatio
-                };
-            });
-
-            summaryData.sort((a, b) => a.sumRatio - b.sumRatio);
-
-            // 전체 요약 테이블
-            html += `
-                <div class="number-section summary">
-                    <div class="number-header">
-                        <span class="number-badge red">📊</span>
-                        <span>전체 숫자별 배당 합계 (비중 낮은 순)</span>
-                    </div>
-                    
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead class="red">
-                                <tr>
-                                    <th>동그라미<br/>숫자</th>
-                                    <th>조합<br/>개수</th>
-                                    <th>배당<br/>합계</th>
-                                    <th>비중<br/>합계(%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-            `;
-            
-            summaryData.forEach(data => {
-                html += `
-                    <tr>
-                        <td class="pair-cell">${data.num}</td>
-                        <td>${data.count}</td>
-                        <td class="odds-cell">${data.sumOdds.toFixed(1)}</td>
-                        <td class="ratio-cell">${data.sumRatio.toFixed(2)}%</td>
-                    </tr>
-                `;
-            });
-            
-            html += `
-                        </tbody>
-                    </table>
-                    </div>
-                    <div class="summary">
-                        <div class="summary-text">
-                            💰 전체 배당 합계: ${totalOdds.toFixed(1)}
-                        </div>
-                    </div>
-                    <div class="summary" style="margin-top: 10px; background: #e8f5e9; border-left-color: #4caf50;">
-                        <div class="summary-text" style="color: #2e7d32;">
-                            📊 비중 통계 분석 (배당합계 기준)<br/>
-                            • 평균: ${(summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length).toFixed(2)}<br/>
-                            • 표준편차: ${(() => {
-                                const mean = summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length;
-                                const variance = summaryData.reduce((sum, d) => sum + Math.pow(d.sumOdds - mean, 2), 0) / summaryData.length;
-                                return Math.sqrt(variance).toFixed(2);
-                            })()}<br/>
-                            • 최대-최소 차이: ${(Math.max(...summaryData.map(d => d.sumOdds)) - Math.min(...summaryData.map(d => d.sumOdds))).toFixed(2)}
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <div class="chart-title">📈 동그라미 숫자별 비중 분포</div>
-            `;
-            
-            // 그래프 생성 (비중 낮은 순서로 이미 정렬되어 있음)
-            const maxRatio = Math.max(...summaryData.map(d => d.sumRatio));
-            summaryData.forEach(data => {
-                const widthPercent = (data.sumRatio / maxRatio * 100);
-                html += `
-                    <div class="chart-bar">
-                        <div class="chart-label">${data.num}</div>
-                        <div class="chart-bar-container">
-                            <div class="chart-bar-fill" style="width: ${widthPercent}%">
-                                <span class="chart-value">${data.sumRatio.toFixed(2)}%</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += `
-                    </div>
-                </div>
-            `;
-
-            // 교차점 분석 테이블
-            if (crossPointSets.length > 0) {
-                html += `
-                    <div class="number-section crosspoint">
-                        <div class="number-header">
-                            <span class="number-badge blue">⚡</span>
-                            <span>교차점 분석</span>
-                        </div>
-                `;
-                
-                crossPointSets.forEach((set, idx) => {
-                    const totalSetOdds = set.first.odds + set.second.odds + (set.crossPoint.odds || 0);
-                    const firstRatio = set.crossPoint.odds ? (set.first.odds / totalSetOdds * 100).toFixed(2) : '-';
-                    const secondRatio = set.crossPoint.odds ? (set.second.odds / totalSetOdds * 100).toFixed(2) : '-';
-                    const crossRatio = set.crossPoint.odds ? (set.crossPoint.odds / totalSetOdds * 100).toFixed(2) : '-';
-                    
-                    html += `
-                        <div class="crosspoint-title">${idx + 1}번째 짝</div>
-                        <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead class="blue">
-                                <tr>
-                                    <th></th>
-                                    <th>${set.first.pairNumber}짝</th>
-                                    <th>${set.second.pairNumber}짝</th>
-                                    <th>교차점</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="font-weight: 600;">번호</td>
-                                    <td class="pair-cell">${set.first.numbers.join(',')}</td>
-                                    <td class="pair-cell">${set.second.numbers.join(',')}</td>
-                                    <td class="pair-cell">${set.crossPoint.numbers.join(',')}</td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">배당</td>
-                                    <td class="odds-cell">${set.first.odds.toFixed(1)}</td>
-                                    <td class="odds-cell">${set.second.odds.toFixed(1)}</td>
-                                    <td class="odds-cell">${set.crossPoint.odds ? set.crossPoint.odds.toFixed(1) : '없음'}</td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight: 600;">비중(%)</td>
-                                    <td class="ratio-cell">${firstRatio}${firstRatio !== '-' ? '%' : ''}</td>
-                                    <td class="ratio-cell">${secondRatio}${secondRatio !== '-' ? '%' : ''}</td>
-                                    <td class="ratio-cell">${crossRatio}${crossRatio !== '-' ? '%' : ''}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" style="font-weight: 600;">계산식</td>
-                                    <td>
-                                        <div class="formula-cell">${set.crossPoint.formula}</div>
-                                        ${set.crossPoint.result ? `<div class="result-cell">${set.crossPoint.result}</div>` : ''}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </div>
-                        ${idx < crossPointSets.length - 1 ? '<div style="height: 20px;"></div>' : ''}
-                    `;
-                });
-                
-                html += `</div>`;
-            }
-
-            // 각 숫자별 상세
+        function displayResults(groupedData, totalOdds, crossPointSets) {            let html = '';                        const sortedNumbers = Object.keys(groupedData).map(Number).sort((a, b) => a - b);                        const summaryData = sortedNumbers.map(num => {                const items = groupedData[num];                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);                const sumRatio = (sumOdds / (totalOdds * 2) * 100);                return {                    num: num,                    count: items.length,                    sumOdds: sumOdds,                    sumRatio: sumRatio                };            });            summaryData.sort((a, b) => a.sumRatio - b.sumRatio);            html += `                <div class="number-section summary">                    <div class="number-header">                        <span class="number-badge red">📊</span>                        <span>전체 숫자별 배당 합계 (비중 낮은 순)</span>                    </div>                                        <div class="table-wrapper">                        <table class="data-table">                            <thead class="red">                                <tr>                                    <th>동그라미<br/>숫자</th>                                    <th>조합<br/>개수</th>                                    <th>배당<br/>합계</th>                                    <th>비중<br/>합계(%)</th>                                </tr>                            </thead>                            <tbody>            `;                        summaryData.forEach(data => {                html += `                    <tr>                        <td class="pair-cell">${data.num}</td>                        <td>${data.count}</td>                        <td class="odds-cell">${data.sumOdds.toFixed(1)}</td>                        <td class="ratio-cell">${data.sumRatio.toFixed(2)}%</td>                    </tr>                `;            });                        html += `                        </tbody>                    </table>                    </div>                    <div class="summary">                        <div class="summary-text">                            💰 전체 배당 합계: ${totalOdds.toFixed(1)}                        </div>                    </div>                    <div class="summary" style="margin-top: 10px; background: #e8f5e9; border-left-color: #4caf50;">                        <div class="summary-text" style="color: #2e7d32;">                            📊 비중 통계 분석 (배당합계 기준)<br/>                            • 평균: ${(summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length).toFixed(2)}<br/>                            • 표준편차: ${(() => {                                const mean = summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length;                                const variance = summaryData.reduce((sum, d) => sum + Math.pow(d.sumOdds - mean, 2), 0) / summaryData.length;                                return Math.sqrt(variance).toFixed(2);                            })()}<br/>                            • 최대-최소 차이: ${(Math.max(...summaryData.map(d => d.sumOdds)) - Math.min(...summaryData.map(d => d.sumOdds))).toFixed(2)}                        </div>                    </div>                    <div class="chart-container">                        <div class="chart-title">📈 동그라미 숫자별 비중 분포</div>            `;                        const maxRatio = Math.max(...summaryData.map(d => d.sumRatio));            summaryData.forEach(data => {                const widthPercent = (data.sumRatio / maxRatio * 100);                html += `                    <div class="chart-bar">                        <div class="chart-label">${data.num}</div>                        <div class="chart-bar-container">                            <div class="chart-bar-fill" style="width: ${widthPercent}%">                                <span class="chart-value">${data.sumRatio.toFixed(2)}%</span>                            </div>                        </div>                    </div>                `;            });                        html += `                    </div>                </div>            `;            html += `                <div class="number-section">                    <div class="number-header">                        <span class="number-badge blue">📋</span>                        <span>각 숫자별 첫 번째 조합 (배당 비중 낮은 순)</span>                    </div>                                        <div class="table-wrapper">                        <table class="data-table">                            <thead class="blue">                                <tr>                                    <th>순서</th>                                    <th>동그라미<br/>안의 숫자</th>                                    <th>상대<br/>숫자</th>                                    <th>배당</th>                                    <th>배당<br/>비중(%)</th>                                </tr>                            </thead>                            <tbody>            `;                        // 각 숫자별 첫 번째 조합 데이터 수집
+            const firstCombinations = [];
             sortedNumbers.forEach(num => {
                 const items = groupedData[num];
-                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);
-                
-                html += `
-                    <div class="number-section">
-                        <div class="number-header">
-                            <span class="number-badge">${numberToCircle(num)}</span>
-                            <span>${numberToCircle(num)}번이 포함된 조합</span>
-                        </div>
-                        
-                        <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>순서</th>
-                                    <th>동그라미<br/>안의 숫자</th>
-                                    <th>상대<br/>숫자</th>
-                                    <th>배당</th>
-                                    <th>배당<br/>비중(%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-                
-                items.forEach((item, index) => {
-                    const otherNumber = item.numbers.find(n => n !== num);
-                    const pageRatio = (item.odds / sumOdds * 100).toFixed(2);
+                if (items && items.length > 0) {
+                    const firstItem = items[0];
+                    const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);
+                    const otherNumber = firstItem.numbers.find(n => n !== num);
+                    const pageRatio = (firstItem.odds / sumOdds * 100);
                     
-                    html += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td class="pair-cell">${item.numbers.join(', ')}</td>
-                            <td class="pair-cell">${otherNumber}</td>
-                            <td class="odds-cell">${item.odds.toFixed(1)}</td>
-                            <td class="ratio-cell">${pageRatio}%</td>
-                        </tr>
-                    `;
-                });
-                
-                html += `
-                            </tbody>
-                        </table>
-                        </div>
-                        
-                        <div class="summary">
-                            <div class="summary-text">
-                                📌 ${numberToCircle(num)}번 합계: 배당 ${sumOdds.toFixed(1)} / 조합 개수 ${items.length}개
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    firstCombinations.push({
+                        num: num,
+                        numbers: firstItem.numbers,
+                        otherNumber: otherNumber,
+                        odds: firstItem.odds,
+                        pageRatio: pageRatio
+                    });
+                }
             });
             
-            resultsDiv.innerHTML = html;
-        }
-
+            // 배당 비중 낮은 순으로 정렬
+            firstCombinations.sort((a, b) => a.pageRatio - b.pageRatio);
+            
+            // 테이블 출력
+            firstCombinations.forEach((item) => {
+                html += `
+                    <tr>
+                        <td>${item.num}</td>
+                        <td class="pair-cell">${item.numbers.join(', ')}</td>
+                        <td class="pair-cell">${item.otherNumber}</td>
+                        <td class="odds-cell">${item.odds.toFixed(1)}</td>
+                        <td class="ratio-cell">${item.pageRatio.toFixed(2)}%</td>
+                    </tr>
+                `;
+            });                        html += `                            </tbody>                        </table>                    </div>                </div>            `;            sortedNumbers.forEach(num => {                const items = groupedData[num];                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);                                html += `                    <div class="number-section">                        <div class="number-header">                            <span class="number-badge">${numberToCircle(num)}</span>                            <span>${numberToCircle(num)}번이 포함된 조합</span>                        </div>                                                <div class="table-wrapper">                        <table class="data-table">                            <thead>                                <tr>                                    <th>순서</th>                                    <th>동그라미<br/>안의 숫자</th>                                    <th>상대<br/>숫자</th>                                    <th>배당</th>                                    <th>배당<br/>비중(%)</th>                                </tr>                            </thead>                            <tbody>                `;                                items.forEach((item, index) => {                    const otherNumber = item.numbers.find(n => n !== num);                    const pageRatio = (item.odds / sumOdds * 100).toFixed(2);                                        html += `                        <tr>                            <td>${index + 1}</td>                            <td class="pair-cell">${item.numbers.join(', ')}</td>                            <td class="pair-cell">${otherNumber}</td>                            <td class="odds-cell">${item.odds.toFixed(1)}</td>                            <td class="ratio-cell">${pageRatio}%</td>                        </tr>                    `;                });                                html += `                            </tbody>                        </table>                        </div>                                                <div class="summary">                            <div class="summary-text">                                📌 ${numberToCircle(num)}번 합계: 배당 ${sumOdds.toFixed(1)} / 조합 개수 ${items.length}개                            </div>                        </div>                    </div>                `;            });            if (analysisHistory2.length > 0) {                html += `<div class="save-status">                    <div class="save-status-text">💾 분석 데이터 저장</div>                    <div class="save-buttons">                        <button class="excel-btn" onclick="exportToExcel2()">📥 엑셀 다운로드 (${analysisHistory2.length}개 회차)</button>                    </div>                </div>`;            }                        document.getElementById('results2').innerHTML = html;        }
         function clearAll2() {
             document.getElementById('inputData').value = '';
             document.getElementById('results2').innerHTML = '';
@@ -2283,6 +2155,28 @@
             }
         }
     
+
+
+        // 스크롤 함수
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function scrollToSection2() {
+            const section2 = document.getElementById('results2');
+            if (section2) {
+                const yOffset = -20; // 상단 여백
+                const y = section2.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({
+                    top: y,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
         // ========== 스크립트 끝 ========== 
         </script>
 </body>
