@@ -820,8 +820,20 @@
             transform: translateY(0);
         }
 
-        .float-btn.secondary {
-            background: linear-gradient(135deg, #1e88e5 0%, #00acc1 100%);
+        .float-btn.btn-a {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+        
+        .float-btn.btn-b {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        }
+        
+        .float-btn.btn-c {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+        }
+        
+        .float-btn.btn-d {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
         }
 
         @media (max-width: 640px) {
@@ -878,11 +890,17 @@
 
         <!-- 플로팅 버튼 -->
         <div class="floating-buttons">
-            <button class="float-btn secondary" onclick="scrollToSection2()" title="배당율 상세 분석으로 이동">
-                ⬇️
+            <button class="float-btn btn-a" onclick="scrollToSectionA()" title="교차점분석1로 이동">
+                A
             </button>
-            <button class="float-btn" onclick="scrollToTop()" title="맨 위로">
-                ⬆️
+            <button class="float-btn btn-b" onclick="scrollToSectionB()" title="1-10줄 분석으로 이동">
+                B
+            </button>
+            <button class="float-btn btn-c" onclick="scrollToSectionC()" title="전체 숫자별 배당 합계로 이동">
+                C
+            </button>
+            <button class="float-btn btn-d" onclick="scrollToSectionD()" title="각 숫자별 첫 번째 조합으로 이동">
+                D
             </button>
         </div>
     </div>
@@ -2158,18 +2176,63 @@
 
 
         // 스크롤 함수
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+        function scrollToSectionA() {
+            // 교차점분석1로 이동 (index1111의 첫 번째 분석 박스)
+            const section = document.querySelector('.analysis-box');
+            if (section) {
+                const yOffset = -20;
+                const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({
+                    top: y,
+                    behavior: 'smooth'
+                });
+            }
         }
 
-        function scrollToSection2() {
-            const section2 = document.getElementById('results2');
-            if (section2) {
-                const yOffset = -20; // 상단 여백
-                const y = section2.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        function scrollToSectionB() {
+            // 1-10줄 분석으로 이동
+            const titles = document.querySelectorAll('.table-title');
+            let target = null;
+            titles.forEach(title => {
+                if (title.textContent.includes('1-10')) {
+                    target = title.parentElement; // table-container
+                }
+            });
+            if (target) {
+                const yOffset = -20;
+                const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({
+                    top: y,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function scrollToSectionC() {
+            // 전체 숫자별 배당 합계로 이동 (index2222의 첫 번째 섹션)
+            const section = document.getElementById('results2');
+            if (section) {
+                const yOffset = -20;
+                const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({
+                    top: y,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function scrollToSectionD() {
+            // 각 숫자별 첫 번째 조합으로 이동
+            const headers = document.querySelectorAll('.number-header');
+            let target = null;
+            headers.forEach(header => {
+                if (header.textContent.includes('각 숫자별 첫 번째 조합')) {
+                    target = header;
+                }
+            });
+            if (target) {
+                const yOffset = -20;
+                const y = target.parentElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
                 window.scrollTo({
                     top: y,
                     behavior: 'smooth'
