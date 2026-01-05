@@ -111,7 +111,7 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             padding: 1rem;
             margin-bottom: 0.75rem;
-            border: 1px solid #E5E7EB;
+            
         }
 
         .analysis-title {
@@ -180,7 +180,7 @@
         .ratio-box {
             border-radius: 0.5rem;
             padding: 0.75rem;
-            border: 1px solid #D1D5DB;
+            
         }
 
         .ratio-box.yellow {
@@ -365,11 +365,168 @@
 
         /* 모바일 반응형 조정 */
         @media (max-width: 768px) {
-            .idx2-container {
-                padding: 0.5rem !important;
-                border-radius: 10px !important;
-            }
+        * {
+            box-sizing: border-box;
         }
+        
+        body {
+            padding: 0.25rem !important;
+        }
+        
+        .container {
+            padding: 0 !important;
+            margin: 0 auto;
+        }
+        
+        .idx2-container {
+            padding: 0 !important;
+        }
+        
+        /* 교차점분석 박스 */
+        .analysis-box {
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            box-sizing: border-box;
+        }
+        
+        /* 카드 그리드 - 간격 최소화 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* 카드 */
+        .card {
+            padding: 0.5rem;
+            box-sizing: border-box;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        /* 동그라미 크기 유지 */
+        .number-display {
+            margin: 0.25rem 0;
+        }
+        
+        .number-display span {
+            font-size: 1.875rem;
+        }
+        
+        .card-label {
+            font-size: 0.7rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .dividend-value {
+            font-size: 1.1rem;
+            padding: 0.2rem 0.5rem;
+        }
+        
+        .proportion-value {
+            font-size: 1rem;
+            margin-top: 0.2rem;
+        }
+        
+        /* 비율 박스 */
+        .ratio-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .ratio-box {
+            padding: 0.5rem;
+        }
+        
+        .ratio-label {
+            font-size: 0.7rem;
+        }
+        
+        .ratio-value {
+            font-size: 1rem;
+        }
+        
+        .ratio-formula {
+            font-size: 0.65rem;
+        }
+        
+        /* 플로팅 버튼 - 위치 조정 */
+        .floating-buttons {
+            position: fixed;
+            right: 0.5rem;
+            bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+        
+        .float-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* ===== 배당율 상세 분석 (results2의 table만) ===== */
+        
+        /* results2 내부의 모든 table */
+        #results2 table {
+            width: 100% !important;
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
+            margin: 0 !important;
+        }
+        
+        #results2 thead,
+        #results2 tbody {
+            width: 100% !important;
+        }
+        
+        #results2 th,
+        #results2 td {
+            padding: 0.35rem 0.1rem !important;
+            font-size: 0.7rem !important;
+            box-sizing: border-box !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* idx2-container 자체도 전체 폭 */
+        .idx2-container {
+            padding: 0.25rem !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        
+        /* 배당율 분석 섹션의 흰색 박스들 */
+        #results2 .number-section {
+            padding: 0.5rem 0.25rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        #results2 .number-header {
+            padding: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        #results2 .table-wrapper {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        #results2 {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+    }
 
         * {
             margin: 0;
@@ -756,31 +913,7 @@
             font-size: 16px;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .idx2-container {
-                padding: 15px;
-                border-radius: 15px;
-            }
-
-            h1 {
-                font-size: 22px;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 8px 4px;
-                font-size: 12px;
-            }
-
-            button {
-                font-size: 14px;
-                padding: 12px 20px;
-            }
-        }
+        
     
 
 
@@ -908,6 +1041,7 @@
     <script>
         let results = null;
         let analysis1 = null;
+        let additionalAnalyses = [];
         let analysis2 = null;
         let analysis3 = null;
 
@@ -1266,6 +1400,182 @@
                 }
             }
             
+            // 10번째 이후 추가 교차점 분석
+            if (sortedData.length > 9) {
+                const usedNumbers = new Set();
+                if (analysis1) {
+                    analysis1.items.forEach(item => {
+                        extractNumbers(item.pair).forEach(n => usedNumbers.add(n));
+                    });
+                }
+                if (analysis2) {
+                    analysis2.items.forEach(item => {
+                        extractNumbers(item.pair).forEach(n => usedNumbers.add(n));
+                    });
+                }
+                if (analysis3) {
+                    analysis3.items.forEach(item => {
+                        extractNumbers(item.pair).forEach(n => usedNumbers.add(n));
+                    });
+                }
+                
+                let analysisCount = 4;
+                let maxAttempts = 10;
+                
+                for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                    const remainingPairs = sortedData.filter(item => {
+                        const nums = extractNumbers(item.pair);
+                        return !nums.some(n => usedNumbers.has(n));
+                    });
+                    if (remainingPairs.length >= 2) {
+                    }
+                    
+                    if (remainingPairs.length < 1) {
+                        break;
+                    }
+                    
+                    let foundPair1 = null;
+                    let foundPair2 = null;
+                    let foundCrossPoint = null;
+                    let foundMatch = false;
+                    
+                    // 먼저 교차점이 있는 경우 찾기
+                    for (let i = 0; i < remainingPairs.length && !foundMatch; i++) {
+                        for (let j = i + 1; j < remainingPairs.length && !foundMatch; j++) {
+                            const p1 = remainingPairs[i];
+                            const p2 = remainingPairs[j];
+                            
+                            const num1_1 = p1.pair[0];
+                            const num1_2 = p1.pair[1];
+                            const num2_1 = p2.pair[0];
+                            const num2_2 = p2.pair[1];
+                            
+                            let crossNum1, crossNum2;
+                            let hasCommon = false;
+                            
+                            if (num1_1 === num2_1) {
+                                crossNum1 = num1_2;
+                                crossNum2 = num2_2;
+                                hasCommon = true;
+                            } else if (num1_1 === num2_2) {
+                                crossNum1 = num1_2;
+                                crossNum2 = num2_1;
+                                hasCommon = true;
+                            } else if (num1_2 === num2_1) {
+                                crossNum1 = num1_1;
+                                crossNum2 = num2_2;
+                                hasCommon = true;
+                            } else if (num1_2 === num2_2) {
+                                crossNum1 = num1_1;
+                                crossNum2 = num2_1;
+                                hasCommon = true;
+                            }
+                            
+                            if (hasCommon) {
+                                const crossPair = [crossNum1, crossNum2].sort().join('');
+                                const crossData = sortedData.find(item => {
+                                    if (item.pair !== crossPair) return false;
+                                    const itemNums = extractNumbers(item.pair);
+                                    return !itemNums.some(n => usedNumbers.has(n));
+                                });
+                                
+                                if (crossData) {
+                                    foundPair1 = p1;
+                                    foundPair2 = p2;
+                                    foundCrossPoint = crossData;
+                                    foundMatch = true;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 교차점을 못 찾았으면 1위, 2위만이라도 표시
+                    if (!foundMatch && remainingPairs.length >= 1) {
+                        foundPair1 = remainingPairs[0];
+                        foundPair2 = remainingPairs.length >= 2 ? remainingPairs[1] : null;
+                        foundCrossPoint = null;
+                        foundMatch = true;
+                    }
+                    
+                    if (foundMatch && foundPair1) {
+                        let items = [
+                            {
+                                label: '1위',
+                                pair: foundPair1.pair,
+                                dividend: foundPair1.dividend,
+                                proportion: 0
+                            }
+                        ];
+                        
+                        if (foundPair2) {
+                            items.push({
+                                label: '2위',
+                                pair: foundPair2.pair,
+                                dividend: foundPair2.dividend,
+                                proportion: 0
+                            });
+                        } else {
+                            items.push({
+                                label: '2위',
+                                pair: '-',
+                                dividend: 0,
+                                proportion: 0
+                            });
+                        }
+                        
+                        if (foundCrossPoint) {
+                            items.push({
+                                label: '교차점',
+                                pair: foundCrossPoint.pair,
+                                dividend: foundCrossPoint.dividend,
+                                proportion: 0
+                            });
+                        } else {
+                            items.push({
+                                label: '교차점',
+                                pair: '-',
+                                dividend: 0,
+                                proportion: 0
+                            });
+                        }
+                        
+                        // 비율 계산
+                        const sum = items.reduce((s, item) => s + item.dividend, 0);
+                        items.forEach(item => {
+                            item.proportion = sum > 0 ? (item.dividend / sum) * 100 : 0;
+                        });
+                        
+                        let ratio = '-';
+                        let addRatio = '-';
+                        
+                        if (foundCrossPoint && foundCrossPoint.dividend > 0) {
+                            ratio = (foundPair1.dividend * foundPair2.dividend / foundCrossPoint.dividend).toFixed(7);
+                            addRatio = ((foundPair1.dividend + foundPair2.dividend) / foundCrossPoint.dividend).toFixed(6);
+                        }
+                        
+                        additionalAnalyses.push({
+                            number: analysisCount,
+                            ratio: ratio,
+                            addRatio: addRatio,
+                            items: items,
+                            hasCrossPoint: !!foundCrossPoint
+                        });
+                        
+                        extractNumbers(foundPair1.pair).forEach(n => usedNumbers.add(n));
+                        if (foundPair2) {
+                            extractNumbers(foundPair2.pair).forEach(n => usedNumbers.add(n));
+                        }
+                        if (foundCrossPoint) {
+                            extractNumbers(foundCrossPoint.pair).forEach(n => usedNumbers.add(n));
+                        }
+                        
+                        analysisCount++;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            
             // 빈도 분석
             const allCircledNums = [];
             for (let char of inputData) {
@@ -1554,6 +1864,65 @@
                     </div>
                 </div></div>`;
             }
+
+            // 추가 교차점 분석 렌더링
+            if (additionalAnalyses && additionalAnalyses.length > 0) {
+                additionalAnalyses.forEach(analysis => {
+                    html += `<div class="analysis-box">
+                        <div class="analysis-title">🎯 교차점분석${analysis.number}</div>
+                        <div class="cards-grid">`;
+                    
+                    analysis.items.forEach((item, idx) => {
+                        const bgColor = idx === 0 ? getDividendColor(item.dividend) : 'transparent';
+                        
+                        if (item.pair === '-') {
+                            html += `<div class="card" style="opacity: 0.5;">
+                                <div class="card-label">${item.label}</div>
+                                <div class="number-display">
+                                    <span>-</span>
+                                </div>
+                                <div class="dividend-value" style="background-color: #ccc">없음</div>
+                                <div class="proportion-value">-</div>
+                            </div>`;
+                        } else {
+                            html += `<div class="card">
+                                <div class="card-label">${item.label}</div>
+                                <div class="number-display">
+                                    ${item.pair.split('').map(c => `<span>${c}</span>`).join('')}
+                                </div>
+                                <div class="dividend-value" style="background-color: ${bgColor}">${item.dividend}</div>
+                                <div class="proportion-value">${item.proportion.toFixed(2)}%</div>
+                            </div>`;
+                        }
+                    });
+                    
+                    html += `</div><div class="ratio-grid">
+                        <div class="ratio-box yellow">
+                            <div class="ratio-label" style="color: #78716C">비율</div>
+                            <div class="ratio-value" style="color: #F59E0B">${analysis.ratio}</div>`;
+                    
+                    if (analysis.hasCrossPoint) {
+                        html += `<div class="ratio-formula" style="color: #78716C">= (${analysis.items[0].dividend} × ${analysis.items[1].dividend}) / ${analysis.items[2].dividend}</div>`;
+                    } else {
+                        html += `<div class="ratio-formula" style="color: #78716C">교차점 없음</div>`;
+                    }
+                    
+                    html += `</div>
+                        <div class="ratio-box" style="background-color: ${analysis.hasCrossPoint ? getAddRatioColor(parseFloat(analysis.addRatio), 0.1, 2.0) : '#ccc'}">
+                            <div class="ratio-label" style="color: black">더하기 비율</div>
+                            <div class="ratio-value" style="color: black">${analysis.addRatio}</div>`;
+                    
+                    if (analysis.hasCrossPoint) {
+                        html += `<div class="ratio-formula" style="color: black">= (${analysis.items[0].dividend} + ${analysis.items[1].dividend}) / ${analysis.items[2].dividend}</div>`;
+                    } else {
+                        html += `<div class="ratio-formula" style="color: black">교차점 없음</div>`;
+                    }
+                    
+                    html += `</div>
+                    </div></div>`;
+                });
+            }
+
 
             // 합산 비율
             if (analysis1 && analysis2 && analysis3) {
