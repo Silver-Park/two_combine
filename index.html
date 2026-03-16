@@ -1913,11 +1913,11 @@
         }
 
         function scrollToSectionB() {
-            // 1-10줄 분석으로 이동
+            // 1-10줄 분석으로 이동 (정확히 "1-10줄 분석" 타이틀만 매칭)
             const titles = document.querySelectorAll('.table-title');
             let target = null;
             titles.forEach(title => {
-                if (title.textContent.includes('1-10')) {
+                if (title.textContent.trim() === '1-10줄 분석') {
                     target = title.parentElement; // table-container
                 }
             });
@@ -1932,6 +1932,4 @@
         }
 
         // ========== 스크립트 끝 ========== 
-        </script>
-</body>
-</html>
+   
