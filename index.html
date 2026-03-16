@@ -336,34 +336,11 @@
         /* ========== index2222 스타일 ========== */
 
         /* 테이블 헤더 색상 명시적 적용 */
-        #results2 .data-table thead {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%) !important;
-            color: white !important;
-        }
 
-        #results2 .data-table thead.red {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
-            color: white !important;
-        }
 
-        #results2 .data-table thead.blue {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
-            color: white !important;
-        }
 
-        #results2 .data-table thead th {
-            color: white !important;
-            font-weight: 600 !important;
-            background: transparent !important;
-        }
-        
-        /* 테이블 일반 셀 */
-        #results2 .data-table td {
-            color: #555 !important;
-            background: white !important;
-        }
-
-        /* 모바일 반응형 조정 */
+/* 테이블 일반 셀 */
+/* 모바일 반응형 조정 */
         @media (max-width: 768px) {
         * {
             box-sizing: border-box;
@@ -471,60 +448,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         
-        /* ===== 배당율 상세 분석 (results2의 table만) ===== */
         
-        /* results2 내부의 모든 table */
-        #results2 table {
-            width: 100% !important;
-            table-layout: fixed !important;
-            border-collapse: collapse !important;
-            margin: 0 !important;
-        }
-        
-        #results2 thead,
-        #results2 tbody {
-            width: 100% !important;
-        }
-        
-        #results2 th,
-        #results2 td {
-            padding: 0.35rem 0.1rem !important;
-            font-size: 0.7rem !important;
-            box-sizing: border-box !important;
-            word-wrap: break-word !important;
-        }
-        
-        /* idx2-container 자체도 전체 폭 */
-        .idx2-container {
-            padding: 0.25rem !important;
-            margin: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-        }
-        
-        
-        /* 배당율 분석 섹션의 흰색 박스들 */
-        #results2 .number-section {
-            padding: 0.5rem 0.25rem !important;
-            margin-bottom: 0.75rem !important;
-        }
-        
-        #results2 .number-header {
-            padding: 0.5rem !important;
-            margin-bottom: 0.5rem !important;
-        }
-        
-        #results2 .table-wrapper {
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-        
-        #results2 {
-            width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
 
     }
 
@@ -960,14 +884,6 @@
         .float-btn.btn-b {
             background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
         }
-        
-        .float-btn.btn-c {
-            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-        }
-        
-        .float-btn.btn-d {
-            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-        }
 
         @media (max-width: 640px) {
             .floating-buttons {
@@ -1001,26 +917,6 @@
 
         <div id="results"></div>
 
-        <!-- ========== index2222 영역 ========== -->
-        <div style="
-            background: linear-gradient(135deg, #1e88e5 0%, #00acc1 100%);
-            margin: 2rem 0 1.5rem 0;
-            padding: 1rem;
-            text-align: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.25rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        ">
-            📊 배당율 상세 분석
-        </div>
-
-        <div class="idx2-container">
-            <div id="results2" class="results"></div>
-        </div>
-
-
         <!-- 플로팅 버튼 -->
         <div class="floating-buttons">
             <button class="float-btn btn-a" onclick="scrollToSectionA()" title="교차점분석1로 이동">
@@ -1028,12 +924,6 @@
             </button>
             <button class="float-btn btn-b" onclick="scrollToSectionB()" title="1-10줄 분석으로 이동">
                 B
-            </button>
-            <button class="float-btn btn-c" onclick="scrollToSectionC()" title="전체 숫자별 배당 합계로 이동">
-                C
-            </button>
-            <button class="float-btn btn-d" onclick="scrollToSectionD()" title="각 숫자별 첫 번째 조합으로 이동">
-                D
             </button>
         </div>
     </div>
@@ -1655,15 +1545,6 @@
             };
 
             renderResults();
-            
-            // index2222 분석 실행
-            setTimeout(function() {
-                try {
-                    analyzeData2();
-                } catch(e) {
-                    console.error('index2222 오류:', e);
-                }
-            }, 150);
         }
 
         function getGradientColor(count, minCount, maxCount) {
@@ -1960,7 +1841,52 @@
             </div>`;
 
             html += renderTable(results.first10, "1-10줄 분석");
-            if (results.second10) html += renderTable(results.second10, "11-20줄 분석", true);
+            if (results.second10) {
+                // 11-20줄 첫부분·중간 + 1-10줄 전체 합산 테이블
+                const circ = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮','⑯'];
+                const gmax = (d) => Math.max(...Object.values(d));
+                const s1 = results.second10.section1;
+                const s2 = results.second10.section2;
+                const s3 = results.first10.all;
+                const m1 = gmax(s1), m2 = gmax(s2), m3 = gmax(s3);
+                // 합산1: 1-10전체 + 11-20첫부분 / 합산2: 합산1 + 11-20중간 (누적)
+                const sSum1 = {}, sSum2 = {};
+                circ.forEach(num => {
+                    sSum1[num] = s3[num] + s1[num];
+                    sSum2[num] = s3[num] + s1[num] + s2[num];
+                });
+                const mSum1 = gmax(sSum1), mSum2 = gmax(sSum2);
+                let ch = `<div class="table-container">
+                    <div class="table-title">11-20줄 첫부분·중간 + 1-10줄 전체 합산</div>
+                    <table>
+                        <colgroup>
+                            <col style="width:9%"/><col style="width:11%"/>
+                            <col style="width:9%"/><col style="width:11%"/>
+                            <col style="width:9%"/><col style="width:11%"/>
+                            <col style="width:9%"/><col style="width:11%"/>
+                        </colgroup>
+                        <thead><tr>
+                            <th>첫부분</th><th></th>
+                            <th>합산1</th><th></th>
+                            <th>중간</th><th></th>
+                            <th>합산2</th><th></th>
+                        </tr></thead><tbody>`;
+                circ.forEach(num => {
+                    ch += `<tr>
+                        <td class="yellow-bg">${num}</td>
+                        <td class="value-cell" style="background-color:${getGradientColor(s1[num],0,m1)}">${s1[num]}</td>
+                        <td class="yellow-bg">${num}</td>
+                        <td class="value-cell" style="background-color:${getGradientColor(sSum1[num],0,mSum1)}">${sSum1[num]}</td>
+                        <td class="yellow-bg">${num}</td>
+                        <td class="value-cell" style="background-color:${getGradientColor(s2[num],0,m2)}">${s2[num]}</td>
+                        <td class="yellow-bg">${num}</td>
+                        <td class="value-cell" style="background-color:${getGradientColor(sSum2[num],0,mSum2)}">${sSum2[num]}</td>
+                    </tr>`;
+                });
+                ch += `</tbody></table></div>`;
+                html += ch;
+                html += renderTable(results.second10, "11-20줄 분석", true);
+            }
             if (results.third10) html += renderTable(results.third10, "21-30줄 분석", true);
             if (results.fourth10) html += renderTable(results.fourth10, "31-40줄 분석", true);
             if (results.fifth10) html += renderTable(results.fifth10, "41-50줄 분석", true);
@@ -1968,579 +1894,7 @@
             document.getElementById('results').innerHTML = html + '</div>';
         }
 
-
-        // ========== index2222 스크립트 ========== 
-        // 분석 이력 저장
-        let analysisHistory2 = [];
-
-        // 동그라미 숫자를 일반 숫자로 변환
-        function circleToNumber(circle) {
-            const circleMap = {
-                '①': 1, '②': 2, '③': 3, '④': 4, '⑤': 5,
-                '⑥': 6, '⑦': 7, '⑧': 8, '⑨': 9, '⑩': 10,
-                '⑪': 11, '⑫': 12, '⑬': 13, '⑭': 14, '⑮': 15, '⑯': 16
-            };
-            return circleMap[circle] || null;
-        }
-
-        // 일반 숫자를 동그라미 숫자로 변환
-        function numberToCircle(num) {
-            const numberMap = {
-                1: '①', 2: '②', 3: '③', 4: '④', 5: '⑤',
-                6: '⑥', 7: '⑦', 8: '⑧', 9: '⑨', 10: '⑩',
-                11: '⑪', 12: '⑫', 13: '⑬', 14: '⑭', 15: '⑮', 16: '⑯'
-            };
-            return numberMap[num] || num.toString();
-        }
-
-        function analyzeData2() {
-            const input = document.getElementById('inputData').value.trim();
-            
-            if (!input) {
-                alert('데이터를 입력해주세요.');
-                return;
-            }
-
-            // 데이터 파싱
-            const pairs = [];
-            const lines = input.split('\n');
-            
-            lines.forEach(line => {
-                const items = line.split(/\s+/);
-                for (let i = 0; i < items.length - 1; i += 2) {
-                    if (items[i] && items[i + 1]) {
-                        const pair = items[i].trim();
-                        const odds = parseFloat(items[i + 1]);
-                        if (pair.length >= 2 && !isNaN(odds)) {
-                            pairs.push({ pair, odds });
-                        }
-                    }
-                }
-            });
-
-            if (pairs.length === 0) {
-                alert('유효한 데이터가 없습니다.');
-                return;
-            }
-
-            // 전체 배당 합계
-            const totalOdds = pairs.reduce((sum, item) => sum + item.odds, 0);
-
-            // 동그라미 숫자별로 그룹화
-            const groupedData = {};
-            
-            pairs.forEach(item => {
-                const chars = item.pair.split('');
-                const numbers = chars.map(c => circleToNumber(c)).filter(n => n !== null);
-                
-                if (numbers.length >= 2) {
-                    numbers.forEach(num => {
-                        if (!groupedData[num]) {
-                            groupedData[num] = [];
-                        }
-                        
-                        groupedData[num].push({
-                            pair: item.pair,
-                            numbers: numbers,
-                            odds: item.odds
-                        });
-                    });
-                }
-            });
-
-            // 교차점 분석
-            const crossPointSets = analyzeCrossPoints(pairs);
-
-            // 분석 이력에 저장
-            analysisHistory2.push({
-                timestamp: new Date(),
-                crossPointSets: crossPointSets,
-                totalOdds: totalOdds
-            });
-
-            // 결과 표시
-            displayResults(groupedData, totalOdds, crossPointSets);
-            
-            // 이력 카운터 업데이트
-            updateHistoryCounter2();
-        }
-
-        function analyzeCrossPoints(pairs) {
-            const crossPointSets = [];
-            const usedIndices = new Set();
-            const usedNumbers = new Set(); // 사용된 모든 숫자 추적
-            
-            let pairCounter = 1; // 짝 순번 (1짝, 2짝, 3짝...)
-            let iterations = 0;
-            
-            while (iterations < 3 && usedIndices.size < pairs.length - 1) {
-                // 1번째 짝 찾기 (사용된 숫자 제외)
-                let firstIdx = -1;
-                let firstNumbers = null;
-                for (let i = 0; i < pairs.length; i++) {
-                    if (!usedIndices.has(i)) {
-                        const chars = pairs[i].pair.split('');
-                        const numbers = chars.map(c => circleToNumber(c)).filter(n => n !== null);
-                        
-                        // 사용된 숫자가 하나도 포함되지 않은 짝 찾기
-                        if (numbers.length >= 2 && !numbers.some(n => usedNumbers.has(n))) {
-                            firstIdx = i;
-                            firstNumbers = numbers;
-                            break;
-                        }
-                    }
-                }
-                
-                if (firstIdx === -1) break;
-                
-                // 2번째 짝 찾기 (사용된 숫자 제외, 1번째 짝과 공통 숫자 있어야 함)
-                let secondIdx = -1;
-                let secondNumbers = null;
-                for (let i = 0; i < pairs.length; i++) {
-                    if (i !== firstIdx && !usedIndices.has(i)) {
-                        const chars = pairs[i].pair.split('');
-                        const numbers = chars.map(c => circleToNumber(c)).filter(n => n !== null);
-                        
-                        // 1번째 짝과 공통 숫자가 있고, 사용된 숫자가 포함되지 않은 짝
-                        const hasCommon = numbers.some(n => firstNumbers.includes(n));
-                        const hasUsedNumber = numbers.some(n => usedNumbers.has(n) && !firstNumbers.includes(n));
-                        
-                        if (numbers.length >= 2 && hasCommon && !hasUsedNumber) {
-                            secondIdx = i;
-                            secondNumbers = numbers;
-                            break;
-                        }
-                    }
-                }
-                
-                if (secondIdx === -1) break;
-                
-                const first = pairs[firstIdx];
-                const second = pairs[secondIdx];
-                
-                // 공통 번호 찾기
-                const commonNumbers = firstNumbers.filter(n => secondNumbers.includes(n));
-                
-                // 교차점 숫자 (공통 번호 제외)
-                const crossNumbers = [
-                    ...firstNumbers.filter(n => !commonNumbers.includes(n)),
-                    ...secondNumbers.filter(n => !commonNumbers.includes(n))
-                ];
-                
-                // 교차점 짝 찾기 (순서 상관없이, 중복 허용)
-                let crossPoint = null;
-                if (crossNumbers.length === 2) {
-                    const [num1, num2] = crossNumbers;
-                    crossPoint = pairs.find((p) => {
-                        const pNumbers = p.pair.split('').map(c => circleToNumber(c)).filter(n => n !== null);
-                        return (pNumbers.includes(num1) && pNumbers.includes(num2)) ||
-                               (pNumbers.includes(num2) && pNumbers.includes(num1));
-                    });
-                }
-                
-                crossPointSets.push({
-                    first: {
-                        numbers: firstNumbers,
-                        pair: first.pair,
-                        odds: first.odds,
-                        pairNumber: pairCounter // 짝 번호
-                    },
-                    second: {
-                        numbers: secondNumbers,
-                        pair: second.pair,
-                        odds: second.odds,
-                        pairNumber: pairCounter + 1 // 짝 번호
-                    },
-                    crossPoint: crossPoint ? {
-                        numbers: crossNumbers,
-                        pair: crossPoint.pair,
-                        odds: crossPoint.odds,
-                        formula: `=(${first.odds.toFixed(1)}*${second.odds.toFixed(1)})/${crossPoint.odds.toFixed(1)}`,
-                        result: ((first.odds * second.odds) / crossPoint.odds).toFixed(3)
-                    } : {
-                        numbers: crossNumbers,
-                        pair: '없음',
-                        odds: null,
-                        formula: '교차점 없음',
-                        result: null
-                    }
-                });
-                
-                // 사용한 인덱스 표시
-                usedIndices.add(firstIdx);
-                usedIndices.add(secondIdx);
-                if (crossPoint) {
-                    const crossIdx = pairs.findIndex(p => p.pair === crossPoint.pair);
-                    if (crossIdx !== -1) usedIndices.add(crossIdx);
-                }
-                
-                // 사용된 숫자 추가 (누적)
-                firstNumbers.forEach(n => usedNumbers.add(n));
-                secondNumbers.forEach(n => usedNumbers.add(n));
-                if (crossPoint && crossPoint.odds) {
-                    crossNumbers.forEach(n => usedNumbers.add(n));
-                }
-                
-                pairCounter += 2; // 다음 세트는 3짝, 4짝...
-                iterations++;
-            }
-            
-            return crossPointSets;
-        }
-
-        function displayResults(groupedData, totalOdds, crossPointSets) {            let html = '';                        const sortedNumbers = Object.keys(groupedData).map(Number).sort((a, b) => a - b);                        const summaryData = sortedNumbers.map(num => {                const items = groupedData[num];                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);                const sumRatio = (sumOdds / (totalOdds * 2) * 100);                return {                    num: num,                    count: items.length,                    sumOdds: sumOdds,                    sumRatio: sumRatio                };            });            summaryData.sort((a, b) => a.sumRatio - b.sumRatio);            html += `                <div class="number-section summary">                    <div class="number-header">                        <span class="number-badge red">📊</span>                        <span>전체 숫자별 배당 합계 (비중 낮은 순)</span>                    </div>                                        <div class="table-wrapper">                        <table class="data-table">                            <thead class="red">                                <tr>                                    <th>동그라미<br/>숫자</th>                                    <th>조합<br/>개수</th>                                    <th>배당<br/>합계</th>                                    <th>비중<br/>합계(%)</th>                                </tr>                            </thead>                            <tbody>            `;                        summaryData.forEach(data => {                html += `                    <tr>                        <td class="pair-cell">${data.num}</td>                        <td>${data.count}</td>                        <td class="odds-cell">${data.sumOdds.toFixed(1)}</td>                        <td class="ratio-cell">${data.sumRatio.toFixed(2)}%</td>                    </tr>                `;            });                        html += `                        </tbody>                    </table>                    </div>                    <div class="summary">                        <div class="summary-text">                            💰 전체 배당 합계: ${totalOdds.toFixed(1)}                        </div>                    </div>                    <div class="summary" style="margin-top: 10px; background: #e8f5e9; border-left-color: #4caf50;">                        <div class="summary-text" style="color: #2e7d32;">                            📊 비중 통계 분석 (배당합계 기준)<br/>                            • 평균: ${(summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length).toFixed(2)}<br/>                            • 표준편차: ${(() => {                                const mean = summaryData.reduce((sum, d) => sum + d.sumOdds, 0) / summaryData.length;                                const variance = summaryData.reduce((sum, d) => sum + Math.pow(d.sumOdds - mean, 2), 0) / summaryData.length;                                return Math.sqrt(variance).toFixed(2);                            })()}<br/>                            • 최대-최소 차이: ${(Math.max(...summaryData.map(d => d.sumOdds)) - Math.min(...summaryData.map(d => d.sumOdds))).toFixed(2)}                        </div>                    </div>                    <div class="chart-container">                        <div class="chart-title">📈 동그라미 숫자별 비중 분포</div>            `;                        const maxRatio = Math.max(...summaryData.map(d => d.sumRatio));            summaryData.forEach(data => {                const widthPercent = (data.sumRatio / maxRatio * 100);                html += `                    <div class="chart-bar">                        <div class="chart-label">${data.num}</div>                        <div class="chart-bar-container">                            <div class="chart-bar-fill" style="width: ${widthPercent}%">                                <span class="chart-value">${data.sumRatio.toFixed(2)}%</span>                            </div>                        </div>                    </div>                `;            });                        html += `                    </div>                </div>            `;            html += `                <div class="number-section">                    <div class="number-header">                        <span class="number-badge blue">📋</span>                        <span>각 숫자별 첫 번째 조합 (배당 비중 낮은 순)</span>                    </div>                                        <div class="table-wrapper">                        <table class="data-table">                            <thead class="blue">                                <tr>                                    <th>순서</th>                                    <th>동그라미<br/>안의 숫자</th>                                    <th>상대<br/>숫자</th>                                    <th>배당</th>                                    <th>배당<br/>비중(%)</th>                                </tr>                            </thead>                            <tbody>            `;                        // 각 숫자별 첫 번째 조합 데이터 수집
-            const firstCombinations = [];
-            sortedNumbers.forEach(num => {
-                const items = groupedData[num];
-                if (items && items.length > 0) {
-                    const firstItem = items[0];
-                    const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);
-                    const otherNumber = firstItem.numbers.find(n => n !== num);
-                    const pageRatio = (firstItem.odds / sumOdds * 100);
-                    
-                    firstCombinations.push({
-                        num: num,
-                        numbers: firstItem.numbers,
-                        otherNumber: otherNumber,
-                        odds: firstItem.odds,
-                        pageRatio: pageRatio
-                    });
-                }
-            });
-            
-            // 배당 비중 낮은 순으로 정렬
-            firstCombinations.sort((a, b) => a.pageRatio - b.pageRatio);
-            
-            // 테이블 출력
-            firstCombinations.forEach((item) => {
-                html += `
-                    <tr>
-                        <td>${item.num}</td>
-                        <td class="pair-cell">${item.numbers.join(', ')}</td>
-                        <td class="pair-cell">${item.otherNumber}</td>
-                        <td class="odds-cell">${item.odds.toFixed(1)}</td>
-                        <td class="ratio-cell">${item.pageRatio.toFixed(2)}%</td>
-                    </tr>
-                `;
-            });                        html += `                            </tbody>                        </table>                    </div>                </div>            `;            sortedNumbers.forEach(num => {                const items = groupedData[num];                const sumOdds = items.reduce((sum, item) => sum + item.odds, 0);                                html += `                    <div class="number-section">                        <div class="number-header">                            <span class="number-badge">${numberToCircle(num)}</span>                            <span>${numberToCircle(num)}번이 포함된 조합</span>                        </div>                                                <div class="table-wrapper">                        <table class="data-table">                            <thead>                                <tr>                                    <th>순서</th>                                    <th>동그라미<br/>안의 숫자</th>                                    <th>상대<br/>숫자</th>                                    <th>배당</th>                                    <th>배당<br/>비중(%)</th>                                </tr>                            </thead>                            <tbody>                `;                                items.forEach((item, index) => {                    const otherNumber = item.numbers.find(n => n !== num);                    const pageRatio = (item.odds / sumOdds * 100).toFixed(2);                                        html += `                        <tr>                            <td>${index + 1}</td>                            <td class="pair-cell">${item.numbers.join(', ')}</td>                            <td class="pair-cell">${otherNumber}</td>                            <td class="odds-cell">${item.odds.toFixed(1)}</td>                            <td class="ratio-cell">${pageRatio}%</td>                        </tr>                    `;                });                                html += `                            </tbody>                        </table>                        </div>                                                <div class="summary">                            <div class="summary-text">                                📌 ${numberToCircle(num)}번 합계: 배당 ${sumOdds.toFixed(1)} / 조합 개수 ${items.length}개                            </div>                        </div>                    </div>                `;            });            if (analysisHistory2.length > 0) {                html += `<div class="save-status">                    <div class="save-status-text">💾 분석 데이터 저장</div>                    <div class="save-buttons">                        <button class="excel-btn" onclick="exportToExcel2()">📥 엑셀 다운로드 (${analysisHistory2.length}개 회차)</button>                    </div>                </div>`;            }                        document.getElementById('results2').innerHTML = html;        }
-        function clearAll2() {
-            document.getElementById('inputData').value = '';
-            document.getElementById('results2').innerHTML = '';
-        }
-
-        function updateHistoryCounter2() {
-            const counter = document.getElementById('historyCounter2');
-            if (counter) {
-                counter.textContent = `저장된 회차: ${analysisHistory2.length}개`;
-            }
-        }
-
-        function clearHistory2() {
-            if (analysisHistory2.length === 0) {
-                alert('저장된 회차가 없습니다.');
-                return;
-            }
-            
-            if (confirm(`${analysisHistory2.length}개 회차를 모두 삭제하시겠습니까?`)) {
-                analysisHistory2 = [];
-                updateHistoryCounter2();
-                alert('모든 회차가 삭제되었습니다.');
-            }
-        }
-
-        async function downloadExcel2() {
-            if (analysisHistory2.length === 0) {
-                alert('저장된 회차가 없습니다. 먼저 분석을 진행해주세요.');
-                return;
-            }
-
-            // SheetJS 라이브러리 로드 확인
-            if (typeof XLSX === 'undefined') {
-                alert('엑셀 라이브러리를 로딩 중입니다. 잠시 후 다시 시도해주세요.');
-                return;
-            }
-
-            // 파일명 입력 받기
-            const defaultFileName = `배당분석_${new Date().toISOString().slice(0, 10)}`;
-            const userFileName = prompt('파일명을 입력하세요 (확장자 제외):', defaultFileName);
-            
-            if (userFileName === null) {
-                return;
-            }
-            
-            const fileName = (userFileName.trim() || defaultFileName) + '.xlsx';
-
-            try {
-                // 엑셀 데이터 생성
-                const ws_data = [];
-                
-                // 최대 숫자 개수 계산
-                let maxNumbers = 0;
-                analysisHistory2.forEach(history => {
-                    if (history.crossPointSets && history.crossPointSets.length > 0) {
-                        // 각 history의 고유 숫자 개수 계산
-                        const uniqueNumbers = new Set();
-                        history.crossPointSets.forEach(set => {
-                            set.first.numbers.forEach(n => uniqueNumbers.add(n));
-                            set.second.numbers.forEach(n => uniqueNumbers.add(n));
-                            if (set.crossPoint && set.crossPoint.numbers) {
-                                set.crossPoint.numbers.forEach(n => uniqueNumbers.add(n));
-                            }
-                        });
-                        if (uniqueNumbers.size > maxNumbers) {
-                            maxNumbers = uniqueNumbers.size;
-                        }
-                    }
-                });
-                
-                // 헤더 1행
-                const header1 = ['', '', ''];
-                for (let i = 0; i < 3; i++) {
-                    header1.push(`${i + 1}번째 짝`, '', '', '', '', '', '', '', '');
-                }
-                
-                // BA열까지 빈 칸 채우기 (BA = 53번째 열, 인덱스 52)
-                while (header1.length < 52) {
-                    header1.push('');
-                }
-                
-                // 숫자 (BA열)
-                header1.push('숫자');
-                
-                // 16칸 띄우기
-                const oddsHeaderIndex = 52 + 16;
-                while (header1.length < oddsHeaderIndex) {
-                    header1.push('');
-                }
-                
-                // 배당합계
-                header1.push('배당합계');
-                
-                // 16칸 띄우기
-                const ratioHeaderIndex = oddsHeaderIndex + 16;
-                while (header1.length < ratioHeaderIndex) {
-                    header1.push('');
-                }
-                
-                // 비중(%)
-                header1.push('비중(%)');
-                
-                // 16칸 띄우기
-                const statsHeaderIndex = ratioHeaderIndex + 16;
-                while (header1.length < statsHeaderIndex) {
-                    header1.push('');
-                }
-                
-                // 빈 칸 1개
-                header1.push('');
-                
-                // 비중 통계 분석 (1칸씩 띄우기)
-                header1.push('평균');
-                header1.push('');
-                header1.push('표준편차');
-                header1.push('');
-                header1.push('최대-최소차이');
-                
-                ws_data.push(header1);
-                
-                // 헤더 2행
-                const header2 = ['', '', '테스트회차'];
-                for (let i = 0; i < 3; i++) {
-                    header2.push('1-1_번호', '1-2_번호', '배당', '2-1_번호', '2-2_번호', '배당', '교차점-1_번호', '교차점-2_번호', '배당');
-                }
-                
-                // BA열까지 빈 칸 채우기
-                while (header2.length < 52) {
-                    header2.push('');
-                }
-                
-                // 숫자들 (1, 2, 3, ...)
-                for (let i = 1; i <= maxNumbers; i++) {
-                    header2.push(i);
-                }
-                
-                // 16칸 띄우기 후 배당합계
-                while (header2.length < oddsHeaderIndex) {
-                    header2.push('');
-                }
-                for (let i = 1; i <= maxNumbers; i++) {
-                    header2.push(i);
-                }
-                
-                // 16칸 띄우기 후 비중
-                while (header2.length < ratioHeaderIndex) {
-                    header2.push('');
-                }
-                for (let i = 1; i <= maxNumbers; i++) {
-                    header2.push(i);
-                }
-                
-                ws_data.push(header2);
-                
-                // 데이터 행
-                analysisHistory2.forEach((history, idx) => {
-                    const row = ['', '', idx + 1];
-                    
-                    // 교차점 분석 데이터
-                    for (let i = 0; i < 3; i++) {
-                        if (i < history.crossPointSets.length) {
-                            const set = history.crossPointSets[i];
-                            row.push(
-                                set.first.numbers[0] || '',
-                                set.first.numbers[1] || '',
-                                set.first.odds || '',
-                                set.second.numbers[0] || '',
-                                set.second.numbers[1] || '',
-                                set.second.odds || '',
-                                set.crossPoint.odds ? (set.crossPoint.numbers[0] || '') : '없음',
-                                set.crossPoint.odds ? (set.crossPoint.numbers[1] || '') : '',
-                                set.crossPoint.odds || '없음'
-                            );
-                        } else {
-                            row.push('', '', '', '', '', '', '', '', '');
-                        }
-                    }
-                    
-                    // BA열까지 빈 칸 채우기
-                    while (row.length < 52) {
-                        row.push('');
-                    }
-                    
-                    // 숫자별 배당 합계 데이터 수집
-                    const numberSums = {};
-                    const numberCounts = {};
-                    history.crossPointSets.forEach(set => {
-                        // first 짝
-                        set.first.numbers.forEach(n => {
-                            if (!numberSums[n]) {
-                                numberSums[n] = 0;
-                                numberCounts[n] = 0;
-                            }
-                        });
-                        // second 짝
-                        set.second.numbers.forEach(n => {
-                            if (!numberSums[n]) {
-                                numberSums[n] = 0;
-                                numberCounts[n] = 0;
-                            }
-                        });
-                        // crossPoint
-                        if (set.crossPoint && set.crossPoint.numbers) {
-                            set.crossPoint.numbers.forEach(n => {
-                                if (!numberSums[n]) {
-                                    numberSums[n] = 0;
-                                    numberCounts[n] = 0;
-                                }
-                            });
-                        }
-                        
-                        // 배당 합산 (각 조합에서 해당 숫자가 포함된 만큼)
-                        set.first.numbers.forEach(n => {
-                            numberSums[n] += set.first.odds;
-                            numberCounts[n]++;
-                        });
-                        set.second.numbers.forEach(n => {
-                            numberSums[n] += set.second.odds;
-                            numberCounts[n]++;
-                        });
-                        if (set.crossPoint && set.crossPoint.odds) {
-                            set.crossPoint.numbers.forEach(n => {
-                                numberSums[n] += set.crossPoint.odds;
-                                numberCounts[n]++;
-                            });
-                        }
-                    });
-                    
-                    // 비중 낮은 순으로 정렬
-                    const totalOdds = Object.values(numberSums).reduce((sum, val) => sum + val, 0);
-                    const sortedNumbers = Object.keys(numberSums)
-                        .map(n => parseInt(n))
-                        .sort((a, b) => numberSums[a] - numberSums[b]);
-                    
-                    if (sortedNumbers.length > 0) {
-                        // 1. 숫자들
-                        sortedNumbers.forEach((num) => {
-                            row.push(num);
-                        });
-                        
-                        // 16칸 띄우기
-                        while (row.length < oddsHeaderIndex) {
-                            row.push('');
-                        }
-                        
-                        // 2. 배당합계들
-                        sortedNumbers.forEach((num) => {
-                            row.push(parseFloat(numberSums[num]).toFixed(1));
-                        });
-                        
-                        // 16칸 띄우기
-                        while (row.length < ratioHeaderIndex) {
-                            row.push('');
-                        }
-                        
-                        // 3. 비중들
-                        sortedNumbers.forEach((num) => {
-                            const ratio = (numberSums[num] / totalOdds * 100).toFixed(2);
-                            row.push(ratio);
-                        });
-                        
-                        // 16칸 띄우기
-                        while (row.length < statsHeaderIndex) {
-                            row.push('');
-                        }
-                        
-                        // 빈 칸 1개
-                        row.push('');
-                        
-                        // 4. 비중 통계 분석
-                        const oddsValues = sortedNumbers.map(num => numberSums[num]);
-                        const avg = oddsValues.reduce((a, b) => a + b, 0) / oddsValues.length;
-                        const variance = oddsValues.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / oddsValues.length;
-                        const stdDev = Math.sqrt(variance);
-                        const maxVal = Math.max(...oddsValues);
-                        const minVal = Math.min(...oddsValues);
-                        const diff = maxVal - minVal;
-                        
-                        row.push(avg.toFixed(2));
-                        row.push(''); // 1칸 띄우기
-                        row.push(stdDev.toFixed(2));
-                        row.push(''); // 1칸 띄우기
-                        row.push(diff.toFixed(2));
-                    }
-                    
-                    ws_data.push(row);
-                });
-                
-                // 워크시트 생성
-                const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                
-                // 열 너비 설정
-                ws['!cols'] = [
-                    { wch: 5 }, { wch: 5 }, { wch: 12 },
-                    { wch: 10 }, { wch: 10 }, { wch: 10 },
-                    { wch: 10 }, { wch: 10 }, { wch: 10 },
-                    { wch: 12 }, { wch: 12 }, { wch: 10 },
-                    { wch: 10 }, { wch: 10 }, { wch: 10 },
-                    { wch: 10 }, { wch: 10 }, { wch: 10 },
-                    { wch: 12 }, { wch: 12 }, { wch: 10 },
-                    { wch: 10 }, { wch: 10 }, { wch: 10 },
-                    { wch: 10 }, { wch: 10 }, { wch: 10 },
-                    { wch: 12 }, { wch: 12 }, { wch: 10 }
-                ];
-                
-                // 워크북 생성
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                
-                // 파일 다운로드
-                XLSX.writeFile(wb, fileName);
-                
-                alert(`${analysisHistory2.length}개 회차가 "${fileName}" 파일로 저장되었습니다.`);
-            } catch (error) {
-                console.error('Excel export error:', error);
-                alert('엑셀 저장 중 오류가 발생했습니다.');
-            }
-        }
+        
     
 
 
@@ -2570,38 +1924,6 @@
             if (target) {
                 const yOffset = -20;
                 const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({
-                    top: y,
-                    behavior: 'smooth'
-                });
-            }
-        }
-
-        function scrollToSectionC() {
-            // 전체 숫자별 배당 합계로 이동 (index2222의 첫 번째 섹션)
-            const section = document.getElementById('results2');
-            if (section) {
-                const yOffset = -20;
-                const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                window.scrollTo({
-                    top: y,
-                    behavior: 'smooth'
-                });
-            }
-        }
-
-        function scrollToSectionD() {
-            // 각 숫자별 첫 번째 조합으로 이동
-            const headers = document.querySelectorAll('.number-header');
-            let target = null;
-            headers.forEach(header => {
-                if (header.textContent.includes('각 숫자별 첫 번째 조합')) {
-                    target = header;
-                }
-            });
-            if (target) {
-                const yOffset = -20;
-                const y = target.parentElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
                 window.scrollTo({
                     top: y,
                     behavior: 'smooth'
